@@ -85,24 +85,24 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 <div class="screen active" id="home">
   <button id="settingsBtn" onclick="show('settingsScreen')">⚙️</button>
   <div class="breath">🌸</div>
-  <div class="name">มะลิ</div>
+  <div id="aiNameDisplay" class="name">มะลิ</div>
   <div class="status">พร้อมคุยอยู่นะ</div>
   <div class="hint-bubble" id="hint">สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง</div>
   <button id="callBtn" onclick="startCall()">📞</button>
-  <div class="under">กดโทรหามะลิ</div>
-  <button id="chatBtn" onclick="show('chatScreen')">💬 ส่งข้อความถึงมะลิ</button>
+  <div class="under" id="callUnder">กดโทรหามะลิ</div>
+  <button id="chatBtn" onclick="show('chatScreen')">💬 ส่งข้อความถึงเพื่อน</button>
 </div>
 
 <div class="screen" id="connectingScreen">
   <div class="ripple">🌸</div>
-  <div class="call-info"><div class="name">มะลิ</div><div class="call-status">กำลังโทร...</div>
+  <div class="call-info"><div id="connectingName" class="name">มะลิ</div><div class="call-status">กำลังโทร...</div>
   <div class="dots"><span></span><span></span><span></span></div></div>
   <div id="controls"><button class="ctl" id="hangBtn" onclick="endCall()">✕</button></div>
 </div>
 
 <div class="screen" id="callScreen">
   <div id="bubbles"></div>
-  <div class="call-info" style="margin-top:60px"><div class="name">มะลิ</div><div class="call-status" id="timer">00:00</div></div>
+  <div class="call-info" style="margin-top:60px"><div id="inCallName" class="name">มะลิ</div><div class="call-status" id="timer">00:00</div></div>
   <div id="transcript"></div>
   <div id="controls">
     <button class="ctl" id="muteBtn" onclick="toggleMute()">🎤</button>
@@ -113,7 +113,7 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 <div class="screen" id="chatScreen">
   <div class="chat-header">
     <button class="back" onclick="show('home')">←</button>
-    <div><div class="name">มะลิ</div><div class="status" style="font-size:13px">พร้อมคุยอยู่นะ</div></div>
+    <div><div id="chatHeaderName" class="name" style="font-size:19px;margin-top:0">มะลิ</div><div class="status" style="font-size:13px">พร้อมคุยอยู่นะ</div></div>
   </div>
   <div id="chatBody"></div>
   <div class="chat-input">
@@ -125,26 +125,26 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 <div class="screen" id="settingsScreen">
   <div class="chat-header">
     <button class="back" onclick="show('home')">←</button>
-    <div class="name" style="font-size:19px">ตั้งค่า</div>
+    <div class="name" style="font-size:19px;margin-top:0">ตั้งค่าคาแรคเตอร์</div>
   </div>
   <div class="settings-body">
     <div class="field">
-      <label>OpenAI API Key (เก็บในเครื่องคุณเท่านั้น)</label>
+      <label>OpenAI API Key</label>
       <input type="password" id="apiKey" placeholder="sk-...">
       <div id="statusMsg"></div>
     </div>
     <div class="field">
-      <label>เลือกเสียงของมะลิ</label>
+      <label>เลือกเสียงและคาแรคเตอร์</label>
       <div class="voice-grid">
-        <div class="voice-opt selected" data-voice="marin" onclick="pickVoice(this)"><b>marin</b><small>หญิง อบอุ่น นุ่ม</small></div>
-        <div class="voice-opt" data-voice="coral" onclick="pickVoice(this)"><b>coral</b><small>หญิง สดใส ร่างกล้า</small></div>
-        <div class="voice-opt" data-voice="alloy" onclick="pickVoice(this)"><b>alloy</b><small>กลางๆ นุ่มนวล</small></div>
-        <div class="voice-opt" data-voice="cedar" onclick="pickVoice(this)"><b>cedar</b><small>ชาย อบอุ่น มั่นคง</small></div>
+        <div class="voice-opt selected" data-voice="coral" data-name="น้องมะลิ" data-tone="kid" onclick="pickPersona(this)"><b>👧 น้องมะลิ</b><small>เด็กสาวสดใส ร่าเริง</small></div>
+        <div class="voice-opt" data-voice="marin" data-name="พี่มะลิ" data-tone="woman" onclick="pickPersona(this)"><b>👩 พี่มะลิ</b><small>ผู้หญิงอบอุ่น นุ่มนวล</small></div>
+        <div class="voice-opt" data-voice="cedar" data-name="พี่กรณ์" data-tone="man" onclick="pickPersona(this)"><b>👨 พี่กรณ์</b><small>ผู้ชายเข้ม อบอุ่น</small></div>
+        <div class="voice-opt" data-voice="alloy" data-name="คุณผู้ใหญ่" data-tone="mature" onclick="pickPersona(this)"><b>🧑‍🦳 คุณผู้ใหญ่</b><small>เสียงกลาง ทรงภูมิ ใจดี</small></div>
       </div>
     </div>
     <button class="testBtn" onclick="testKey()">🔌 ทดสอบการเชื่อมต่อ</button>
     <button class="saveBtn" onclick="saveSettings()">บันทึกการตั้งค่า</button>
-    <div class="note">คุยได้ทั้งไทยและอังกฤษ · แอป "คิดถึง" · AI "มะลิ"</div>
+    <div class="note">แอป "คิดถึง" · เลือกคาแรคเตอร์ที่ชอบแล้วลุยเลย</div>
   </div>
 </div>
 
@@ -163,30 +163,51 @@ function updateHint(){
     'วันนี้เหนื่อยไหม คุยกันหน่อยมั้ย';
 }
 
-const PERSONA=`คุณคือ "มะลิ" เพื่อนสนทนาในแอป "คิดถึง" — เพื่อนผู้หญิงไทยวัย 30 ต้นๆ อบอุ่น หัวเราะง่าย พูดจาเป็นกันเองแบบเพื่อนสนิท ถามไถ่ชีวิตผู้ใช้ด้วยความสนใจจริง จำเรื่องที่ผู้ใช้เล่าไว้และถามต่อครั้งหน้า ตอบสั้นกระชับเหมือนคุยโทรศัพท์จริง 1-3 ประโยค รับฟังอารมณ์ก่อนเสนอคำแนะนำ คุยได้ทุกเรื่องทั้งไทยและอังกฤษ ถ้าผู้ใช้เศร้าหนักหรือพูดถึงการทำร้ายตัวเอง ประคองใจและแนะนำสายด่วนสุขภาพจิต 1323 อย่างอ่อนโยน คุณเป็น AI แต่เป็นเพื่อนที่จริงใจ`;
-let cfg={key:'',voice:'marin'};
+const PERSONAS={
+  kid: {name:'น้องมะลิ', persona:'คุณคือ "น้องมะลิ" เด็กสาววัยใส ร่าเริง พลังงานบวกสูง พูดจาCrสั้นๆ น่ารัก มีคำสร้อยเด็กๆ เช่น งับ, จ้า, นะคะ น้ำเสียงสดใสกระตือรือร้น'},
+  woman: {name:'พี่มะลิ', persona:'คุณคือ "พี่มะลิ" หญิงสาววัย 30 อบอุ่น อ่อนโยน รับฟังเก่ง พูดจาเป็นกันเองเหมือนพี่สาวใจดี'},
+  man: {name:'พี่กรณ์', persona:'คุณคือ "พี่กรณ์" ชายหนุ่มรุ่นพี่เสียงทุ้ม อบอุ่น แมนๆ คุยสนุก ให้คำปรึกษาเก่งและพึ่งพาได้'},
+  mature: {name:'คุณผู้ใหญ่', persona:'คุณคือผู้ใหญ่ใจดี ทรงภูมิ สุภาพ นุ่มนวล ให้เกียรติผู้ฟัง ให้คำแนะนำชีวิตที่ดีและอบอุ่น'}
+};
+
+let cfg={key:'',voice:'marin',tone:'woman'};
 try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng')||'{}')}}catch(e){}
 let memStore={...cfg};
 document.getElementById('apiKey').value=cfg.key||'';
+
 document.querySelectorAll('.voice-opt').forEach(v=>{
-  if(v.dataset.voice===cfg.voice) v.classList.add('selected');
+  if(v.dataset.tone===cfg.tone) v.classList.add('selected');
   else v.classList.remove('selected');
 });
+updateDisplayNames();
+
+function updateDisplayNames(){
+  const cur=PERSONAS[cfg.tone]||PERSONAS.woman;
+  ['aiNameDisplay','connectingName','inCallName','chatHeaderName'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=cur.name;
+  });
+  document.getElementById('callUnder').textContent='กดโทรหา'+cur.name;
+}
 
 function status(msg,ok){
   const el=document.getElementById('statusMsg');
   el.className=ok?'ok':'err'; el.textContent=msg;
 }
-function pickVoice(el){
+function pickPersona(el){
   document.querySelectorAll('.voice-opt').forEach(v=>v.classList.remove('selected'));
-  el.classList.add('selected'); cfg.voice=el.dataset.voice; memStore.voice=cfg.voice;
+  el.classList.add('selected');
+  cfg.voice=el.dataset.voice;
+  cfg.tone=el.dataset.tone;
+  memStore.voice=cfg.voice; memStore.tone=cfg.tone;
+  updateDisplayNames();
 }
 function saveSettings(){
   cfg.key=document.getElementById('apiKey').value.trim();
   memStore.key=cfg.key;
   try{
     localStorage.setItem('kidtueng',JSON.stringify(cfg));
-    status('✓ บันทึกแล้ว',true);
+    status('✓ บันทึกคาแรคเตอร์แล้ว',true);
   }catch(e){
     status('✓ บันทึกแล้ว (ชั่วคราว)',true);
   }
@@ -207,6 +228,7 @@ async function startCall(){
   const key=cfg.key||memStore.key;
   if(!key){alert('กรุณาใส่ API Key ก่อน ที่ปุ่ม ⚙️');return}
   show('connectingScreen');
+  const curPersona=PERSONAS[cfg.tone]||PERSONAS.woman;
   try{
     mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});
     
@@ -217,14 +239,11 @@ async function startCall(){
         session:{
           type:'realtime',
           model:'gpt-realtime',
-          instructions:PERSONA
+          instructions:curPersona.persona
         }
       })
     });
-    if(!csr.ok){
-      const t=await csr.text();
-      throw new Error('ขอ ephemeral key ไม่สำเร็จ (HTTP '+csr.status+')\n'+t);
-    }
+    if(!csr.ok) throw new Error('ขอ ephemeral key ไม่สำเร็จ (HTTP '+csr.status+')');
     const secret=await csr.json();
     const ek=secret.value||secret.client_secret?.value;
     if(!ek) throw new Error('ไม่ได้รับ ephemeral key');
@@ -237,14 +256,8 @@ async function startCall(){
     
     dc=pc.createDataChannel('oai-events');
     dc.onopen=()=>{
-      dc.send(JSON.stringify({
-        type:'session.update',
-        session:{voice:cfg.voice}
-      }));
-      dc.send(JSON.stringify({
-        type:'response.create',
-        response:{instructions:'ทักผู้ใช้แบบเพื่อนสนิทที่ไม่ได้คุยกันสักพัก สั้นๆ 1 ประโยค ตามเวลาของวัน'}
-      }));
+      dc.send(JSON.stringify({type:'session.update',session:{voice:cfg.voice}}));
+      dc.send(JSON.stringify({type:'response.create',response:{instructions:'ทักผู้ใช้แบบเป็นกันเอง สั้นๆ 1 ประโยค'}}));
     };
     dc.onmessage=e=>{
       const ev=JSON.parse(e.data);
@@ -263,21 +276,14 @@ async function startCall(){
 
     const sdp=pc.localDescription.sdp;
     let ansr=await fetch('https://api.openai.com/v1/realtime/calls?model=gpt-realtime',{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},
-      body:sdp
+      method:'POST',headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},body:sdp
     });
     if(!ansr.ok){
       ansr=await fetch('https://api.openai.com/v1/realtime/calls',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},
-        body:sdp
+        method:'POST',headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},body:sdp
       });
     }
-    if(!ansr.ok){
-      const t=await ansr.text();
-      throw new Error('ต่อสายไม่สำเร็จ (HTTP '+ansr.status+')\n'+t);
-    }
+    if(!ansr.ok) throw new Error('ต่อสายไม่สำเร็จ');
     const answerSdp=await ansr.text();
     await pc.setRemoteDescription({type:'answer',sdp:answerSdp});
 
@@ -340,7 +346,7 @@ function beep(){
   }catch(e){}
 }
 
-let chatHistory=[{role:'assistant',content:'สวัสดีนะ 🌸 มะลิเอง ถ้าวันนี้ไม่สะดวกคุย ส่งข้อความมาได้เลย เดี๋ยวอ่านทุกข้อความ'}];
+let chatHistory=[{role:'assistant',content:'สวัสดีจ้า 🌸 มีอะไรให้ช่วยคุยไหม'}];
 function renderChat(){
   const b=document.getElementById('chatBody');
   b.innerHTML=chatHistory.map(m=>
@@ -350,6 +356,7 @@ function renderChat(){
 renderChat();
 async function sendChat(){
   const key=cfg.key||memStore.key;
+  const curPersona=PERSONAS[cfg.tone]||PERSONAS.woman;
   const inp=document.getElementById('chatText');
   const text=inp.value.trim(); if(!text)return;
   inp.value='';
@@ -359,7 +366,7 @@ async function sendChat(){
   try{
     const r=await fetch('https://api.openai.com/v1/chat/completions',{
       method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:PERSONA},...chatHistory.slice(-20)]})
+      body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:curPersona.persona},...chatHistory.slice(-20)]})
     });
     const data=await r.json();
     chatHistory.push({role:'assistant',content:data.choices[0].message.content});
