@@ -138,8 +138,8 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
       <div class="voice-grid">
         <div class="voice-opt selected" data-voice="marin" onclick="pickVoice(this)"><b>marin</b><small>หญิง อบอุ่น นุ่ม</small></div>
         <div class="voice-opt" data-voice="coral" onclick="pickVoice(this)"><b>coral</b><small>หญิง สดใส ร่างกล้า</small></div>
+        <div class="voice-opt" data-voice="alloy" onclick="pickVoice(this)"><b>alloy</b><small>กลางๆ นุ่มนวล</small></div>
         <div class="voice-opt" data-voice="cedar" onclick="pickVoice(this)"><b>cedar</b><small>ชาย อบอุ่น มั่นคง</small></div>
-        <div class="voice-opt" data-voice="ballad" onclick="pickVoice(this)"><b>ballad</b><small>ชาย อ่อนโยน</small></div>
       </div>
     </div>
     <button class="testBtn" onclick="testKey()">🔌 ทดสอบการเชื่อมต่อ</button>
@@ -163,12 +163,11 @@ function updateHint(){
     'วันนี้เหนื่อยไหม คุยกันหน่อยมั้ย';
 }
 
-const PERSONA=`คุณคือ "มะลิ" เพื่อนสนทนาในแอป "คิดถึง" — ผู้หญิงไทยวัย 30 ต้นๆ อบอุ่น หัวเราะง่าย พูดจาเป็นกันเองแบบเพื่อนสนิท ถามไถ่ชีวิตผู้ใช้ด้วยความสนใจจริง จำเรื่องที่ผู้ใช้เล่าไว้และถามต่อครั้งหน้า ตอบสั้นกระชับเหมือนคุยโทรศัพท์จริง 1-3 ประโยค รับฟังอารมณ์ก่อนเสนอคำแนะนำ คุยได้ทุกเรื่องทั้งไทยและอังกฤษ ถ้าผู้ใช้เศร้าหนักหรือพูดถึงการทำร้ายตัวเอง ประคองใจและแนะนำสายด่วนสุขภาพจิต 1323 อย่างอ่อนโยน คุณเป็น AI แต่เป็นเพื่อนที่จริงใจ`;
+const PERSONA=`คุณคือ "มะลิ" เพื่อนสนทนาในแอป "คิดถึง" — เพื่อนผู้หญิงไทยวัย 30 ต้นๆ อบอุ่น หัวเราะง่าย พูดจาเป็นกันเองแบบเพื่อนสนิท ถามไถ่ชีวิตผู้ใช้ด้วยความสนใจจริง จำเรื่องที่ผู้ใช้เล่าไว้และถามต่อครั้งหน้า ตอบสั้นกระชับเหมือนคุยโทรศัพท์จริง 1-3 ประโยค รับฟังอารมณ์ก่อนเสนอคำแนะนำ คุยได้ทุกเรื่องทั้งไทยและอังกฤษ ถ้าผู้ใช้เศร้าหนักหรือพูดถึงการทำร้ายตัวเอง ประคองใจและแนะนำสายด่วนสุขภาพจิต 1323 อย่างอ่อนโยน คุณเป็น AI แต่เป็นเพื่อนที่จริงใจ`;
 let cfg={key:'',voice:'marin'};
 try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng')||'{}')}}catch(e){}
 let memStore={...cfg};
 document.getElementById('apiKey').value=cfg.key||'';
-// เผลอเลือกเสียงเดิมให้ตรง UI
 document.querySelectorAll('.voice-opt').forEach(v=>{
   if(v.dataset.voice===cfg.voice) v.classList.add('selected');
   else v.classList.remove('selected');
@@ -211,7 +210,6 @@ async function startCall(){
   try{
     mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});
     
-    // ขอ ephemeral key แบบถูกต้อง (ไม่ส่ง voice ไปปะปนใน session)
     const csr=await fetch('https://api.openai.com/v1/realtime/client_secrets',{
       method:'POST',
       headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
@@ -239,7 +237,6 @@ async function startCall(){
     
     dc=pc.createDataChannel('oai-events');
     dc.onopen=()=>{
-      // กำหนดเสียงผ่าน session.update พร้อมสั่งทักทาย
       dc.send(JSON.stringify({
         type:'session.update',
         session:{voice:cfg.voice}
