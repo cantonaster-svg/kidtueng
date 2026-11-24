@@ -144,7 +144,7 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
     </div>
     <button class="testBtn" onclick="testKey()">🔌 ทดสอบการเชื่อมต่อ</button>
     <button class="saveBtn" onclick="saveSettings()">บันทึกการตั้งค่า</button>
-    <div class="note">คุยได้ทั้งไทยและอังกฤษ · แอป "คิดถึง" · AI "มะลิ"<br>ใช้งานไมโครโฟนต้องเปิดผ่าน https (เช่น Vercel) ไม่ใช่ไฟล์ตรงๆ</div>
+    <div class="note">คุยได้ทั้งไทยและอังกฤษ · แอป "คิดถึง" · AI "มะลิ"</div>
   </div>
 </div>
 
@@ -163,12 +163,17 @@ function updateHint(){
     'วันนี้เหนื่อยไหม คุยกันหน่อยมั้ย';
 }
 
-/* ---------- ตั้งค่า (localStorage + fallback ในหน่วยความจำ) ---------- */
 const PERSONA=`คุณคือ "มะลิ" เพื่อนสนทนาในแอป "คิดถึง" — ผู้หญิงไทยวัย 30 ต้นๆ อบอุ่น หัวเราะง่าย พูดจาเป็นกันเองแบบเพื่อนสนิท ถามไถ่ชีวิตผู้ใช้ด้วยความสนใจจริง จำเรื่องที่ผู้ใช้เล่าไว้และถามต่อครั้งหน้า ตอบสั้นกระชับเหมือนคุยโทรศัพท์จริง 1-3 ประโยค รับฟังอารมณ์ก่อนเสนอคำแนะนำ คุยได้ทุกเรื่องทั้งไทยและอังกฤษ ถ้าผู้ใช้เศร้าหนักหรือพูดถึงการทำร้ายตัวเอง ประคองใจและแนะนำสายด่วนสุขภาพจิต 1323 อย่างอ่อนโยน คุณเป็น AI แต่เป็นเพื่อนที่จริงใจ`;
 let cfg={key:'',voice:'marin'};
 try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng')||'{}')}}catch(e){}
-let memStore={...cfg}; // สำรองไว้ใน memory กรณี localStorage ถูกบล็อก
+let memStore={...cfg};
 document.getElementById('apiKey').value=cfg.key||'';
+// เผลอเลือกเสียงเดิมให้ตรง UI
+document.querySelectorAll('.voice-opt').forEach(v=>{
+  if(v.dataset.voice===cfg.voice) v.classList.add('selected');
+  else v.classList.remove('selected');
+});
+
 function status(msg,ok){
   const el=document.getElementById('statusMsg');
   el.className=ok?'ok':'err'; el.textContent=msg;
@@ -182,9 +187,9 @@ function saveSettings(){
   memStore.key=cfg.key;
   try{
     localStorage.setItem('kidtueng',JSON.stringify(cfg));
-    status('✓ บันทึกแล้ว (เก็บในเครื่องถาวร)',true);
+    status('✓ บันทึกแล้ว',true);
   }catch(e){
-    status('✓ บันทึกแล้ว (ชั่วคราว — browser นี้บล็อกการจำค่า ต้องใส่ key ใหม่ทุกครั้งที่เปิดใหม่)',true);
+    status('✓ บันทึกแล้ว (ชั่วคราว)',true);
   }
 }
 async function testKey(){
@@ -193,55 +198,56 @@ async function testKey(){
   status('กำลังทดสอบ...',true);
   try{
     const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}});
-    if(r.ok){status('✓ Key ใช้ได้! บันทึกแล้วกดโทรได้เลย',true);
-      saveSettings();}
-    else{
-      const t=await r.text();
-      status('✗ Key มีปัญหา (HTTP '+r.status+')\n'+t.slice(0,300),false);
-    }
-  }catch(e){status('✗ ต่อไม่ถึง OpenAI: '+e.message+'\nเช็คอินเทอร์เน็ต',false)}
+    if(r.ok){status('✓ Key ใช้ได้!',true);saveSettings();}
+    else{status('✗ Key มีปัญหา (HTTP '+r.status+')',false);}
+  }catch(e){status('✗ เชื่อมต่อไม่ได้',false)}
 }
 
-/* ---------- โทร: Realtime GA (client_secrets + WebRTC) ---------- */
 let pc,mediaStream,dc,timerInt,callStart,remoteAudio;
 async function startCall(){
   const key=cfg.key||memStore.key;
   if(!key){alert('กรุณาใส่ API Key ก่อน ที่ปุ่ม ⚙️');return}
   show('connectingScreen');
   try{
-    // 0. เช็คว่าอยู่ใน secure context หรือไม่ (ไมค์)
-    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-      throw new Error('browser นี้ไม่รองรับไมค์ — ต้องเปิดผ่าน https เช่น deploy บน Vercel');
-    }
-    // 1. ขอไมค์
     mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    // 2. ขอ ephemeral key (GA) พร้อม session config
+    
+    // ขอ ephemeral key แบบถูกต้อง (ไม่ส่ง voice ไปปะปนใน session)
     const csr=await fetch('https://api.openai.com/v1/realtime/client_secrets',{
       method:'POST',
       headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-      body:JSON.stringify({session:{
-        type:'realtime',model:'gpt-realtime',voice:cfg.voice,instructions:PERSONA,
-        input_audio_transcription:{model:'gpt-4o-transcribe'}
-      }})
+      body:JSON.stringify({
+        session:{
+          type:'realtime',
+          model:'gpt-realtime',
+          instructions:PERSONA
+        }
+      })
     });
     if(!csr.ok){
       const t=await csr.text();
-      throw new Error('ขอ ephemeral key ไม่สำเร็จ (HTTP '+csr.status+')\n'+t.slice(0,300));
+      throw new Error('ขอ ephemeral key ไม่สำเร็จ (HTTP '+csr.status+')\n'+t);
     }
     const secret=await csr.json();
     const ek=secret.value||secret.client_secret?.value;
-    if(!ek) throw new Error('ไม่ได้รับ ephemeral key จาก response');
-    // 3. ตั้ง WebRTC
+    if(!ek) throw new Error('ไม่ได้รับ ephemeral key');
+
     pc=new RTCPeerConnection();
     pc.addTrack(mediaStream.getAudioTracks()[0]);
     remoteAudio=document.createElement('audio');
     remoteAudio.autoplay=true; document.body.appendChild(remoteAudio);
     pc.ontrack=e=>{remoteAudio.srcObject=e.streams[0]};
+    
     dc=pc.createDataChannel('oai-events');
     dc.onopen=()=>{
-      // มะลิทักก่อน
-      dc.send(JSON.stringify({type:'response.create',response:{instructions:
-        'ทักผู้ใช้แบบเพื่อนสนิทที่ไม่ได้คุยกันสักพัก สั้นๆ 1 ประโยค ตามเวลาของวัน'}}));
+      // กำหนดเสียงผ่าน session.update พร้อมสั่งทักทาย
+      dc.send(JSON.stringify({
+        type:'session.update',
+        session:{voice:cfg.voice}
+      }));
+      dc.send(JSON.stringify({
+        type:'response.create',
+        response:{instructions:'ทักผู้ใช้แบบเพื่อนสนิทที่ไม่ได้คุยกันสักพัก สั้นๆ 1 ประโยค ตามเวลาของวัน'}
+      }));
     };
     dc.onmessage=e=>{
       const ev=JSON.parse(e.data);
@@ -249,22 +255,22 @@ async function startCall(){
         document.getElementById('transcript').textContent+=ev.delta;
       }
       if(ev.type==='response.audio.delta'){spawnBubbles(true);}
-      if(ev.type==='response.done'){spawnBubbles(false);
-        document.getElementById('transcript').textContent+='\n';}
+      if(ev.type==='response.done'){spawnBubbles(false);document.getElementById('transcript').textContent+='\n';}
     };
-    // 4. สร้าง offer แล้วส่งไป /v1/realtime/calls
+
     const offer=await pc.createOffer();
     await pc.setLocalDescription(offer);
     await new Promise(res=>{if(pc.iceGatheringState==='complete')res();
       else{pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==='complete')res()};
-      setTimeout(res,3000)}}); // รอ ICE ไม่เกิน 3 วิ
+      setTimeout(res,3000)}});
+
     const sdp=pc.localDescription.sdp;
     let ansr=await fetch('https://api.openai.com/v1/realtime/calls?model=gpt-realtime',{
       method:'POST',
       headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},
       body:sdp
     });
-    if(!ansr.ok){ // ลองแบบไม่มี query param
+    if(!ansr.ok){
       ansr=await fetch('https://api.openai.com/v1/realtime/calls',{
         method:'POST',
         headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},
@@ -273,11 +279,11 @@ async function startCall(){
     }
     if(!ansr.ok){
       const t=await ansr.text();
-      throw new Error('ต่อสายไม่สำเร็จ (HTTP '+ansr.status+')\n'+t.slice(0,300));
+      throw new Error('ต่อสายไม่สำเร็จ (HTTP '+ansr.status+')\n'+t);
     }
     const answerSdp=await ansr.text();
     await pc.setRemoteDescription({type:'answer',sdp:answerSdp});
-    // 5. เสียงโทร แล้วเข้าหน้าคุย
+
     beep();
     setTimeout(()=>{
       show('callScreen');
@@ -337,9 +343,7 @@ function beep(){
   }catch(e){}
 }
 
-/* ---------- แชท (แสดง error จริง) ---------- */
-let chatHistory=[{role:'assistant',
-  content:'สวัสดีนะ 🌸 มะลิเอง ถ้าวันนี้ไม่สะดวกคุย ส่งข้อความมาได้เลย เดี๋ยวอ่านทุกข้อความ'}];
+let chatHistory=[{role:'assistant',content:'สวัสดีนะ 🌸 มะลิเอง ถ้าวันนี้ไม่สะดวกคุย ส่งข้อความมาได้เลย เดี๋ยวอ่านทุกข้อความ'}];
 function renderChat(){
   const b=document.getElementById('chatBody');
   b.innerHTML=chatHistory.map(m=>
@@ -354,22 +358,16 @@ async function sendChat(){
   inp.value='';
   chatHistory.push({role:'user',content:text});
   renderChat();
-  if(!key){chatHistory.push({role:'assistant',content:'(ยังไม่ได้ใส่ API Key — ไปที่ ⚙️ ก่อนนะ)'});renderChat();return}
+  if(!key){chatHistory.push({role:'assistant',content:'(ยังไม่ได้ใส่ API Key)'});renderChat();return}
   try{
     const r=await fetch('https://api.openai.com/v1/chat/completions',{
       method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gpt-4o-mini',
-        messages:[{role:'system',content:PERSONA},...chatHistory.slice(-20)]})
+      body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:PERSONA},...chatHistory.slice(-20)]})
     });
-    if(!r.ok){
-      const t=await r.text();
-      chatHistory.push({role:'assistant',content:'(ผิดพลาด HTTP '+r.status+': '+t.slice(0,150)+')'});
-    }else{
-      const data=await r.json();
-      chatHistory.push({role:'assistant',content:data.choices[0].message.content});
-    }
+    const data=await r.json();
+    chatHistory.push({role:'assistant',content:data.choices[0].message.content});
   }catch(e){
-    chatHistory.push({role:'assistant',content:'(เชื่อมต่อไม่ได้: '+e.message+')'});
+    chatHistory.push({role:'assistant',content:'(เชื่อมต่อไม่ได้)'});
   }
   renderChat();
 }
