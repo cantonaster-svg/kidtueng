@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>คิดถึง — A/B Testing & Persona Lab</title>
+<title>คิดถึง — A/B Testing & Chat Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg-cream:#FFF8F0;--bg-peach:#FFE8D6;--primary:#FF9A76;--primary-deep:#E87B54;--sage:#8FBF9F;
@@ -22,9 +22,10 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 .status::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--sage);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .hint-bubble{background:#fff;border-radius:18px;padding:10px 20px;margin-top:26px;color:var(--text-sub);font-weight:300;box-shadow:0 4px 12px rgba(0,0,0,.05);text-align:center;max-width:80%}
-#callBtn{margin-top:44px;width:104px;height:104px;border-radius:50%;border:none;background:linear-gradient(145deg,var(--primary),var(--primary-deep));color:#fff;font-size:40px;box-shadow:var(--shadow-soft);cursor:pointer}
+#callBtn{margin-top:36px;width:104px;height:104px;border-radius:50%;border:none;background:linear-gradient(145deg,var(--primary),var(--primary-deep));color:#fff;font-size:40px;box-shadow:var(--shadow-soft);cursor:pointer}
 #callBtn:active{transform:scale(.92)}
 .under{color:var(--text-sub);font-weight:300;margin-top:10px}
+#chatBtn{margin-top:24px;padding:12px 28px;border-radius:99px;border:1.5px solid var(--primary);background:transparent;color:var(--primary);font-family:'Mitr';font-size:15px;cursor:pointer}
 #settingsBtn{position:absolute;top:20px;right:20px;width:42px;height:42px;border-radius:50%;border:none;background:#fff;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.06);cursor:pointer}
 #connectingScreen,#callScreen{background:linear-gradient(180deg,#FFEFE3,#FFDCC2);align-items:center;justify-content:center}
 .ripple::before,.ripple::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:2px solid rgba(255,154,118,.5);animation:rip 1.8s infinite}
@@ -41,6 +42,19 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 .ctl{width:62px;height:62px;border-radius:50%;border:none;background:#fff;font-size:22px;box-shadow:0 4px 12px rgba(0,0,0,.08);cursor:pointer}
 .ctl.muted{background:var(--text-sub)}
 .hang{width:70px;height:70px;background:var(--danger);font-size:26px}
+
+/* Chat Screen */
+#chatScreen{background:var(--bg-cream)}
+.chat-header{padding:16px 20px;background:#fff;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.back{width:38px;height:38px;border-radius:50%;border:none;background:var(--bg-peach);cursor:pointer;font-size:16px}
+.chat-header .name{font-size:19px;margin-top:0}
+#chatBody{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:78%;padding:10px 16px;border-radius:22px;font-weight:300;font-size:15.5px;line-height:1.5;white-space:pre-wrap}
+.msg.ai{background:#FFE3D1;border-bottom-left-radius:6px;align-self:flex-start}
+.msg.me{background:#fff;border-bottom-right-radius:6px;align-self:flex-end;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.chat-input{padding:12px 14px 22px;background:#fff;display:flex;gap:10px}
+.chat-input input{flex:1;border:1.5px solid var(--bg-peach);border-radius:99px;padding:12px 18px;font-family:'Mitr';font-size:15px;outline:none;background:var(--bg-cream)}
+.sendBtn{width:48px;height:48px;border-radius:50%;border:none;background:var(--primary);color:#fff;font-size:18px;cursor:pointer}
 
 /* Feedback Modal */
 #feedbackModal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
@@ -68,8 +82,6 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 #statusMsg{margin-top:10px;padding:10px;border-radius:10px;font-size:13px;display:none}
 #statusMsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
 #statusMsg.err{display:block;background:#FDECEA;color:#C62828}
-.chat-header{padding:16px 20px;background:#fff;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.back{width:38px;height:38px;border-radius:50%;border:none;background:var(--bg-peach);cursor:pointer;font-size:16px}
 </style>
 </head>
 <body>
@@ -82,6 +94,7 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
   <div class="hint-bubble" id="hint">สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง</div>
   <button id="callBtn" onclick="startCall()">📞</button>
   <div class="under" id="callUnder">กดโทรหาน้องมะลิ</div>
+  <button id="chatBtn" onclick="show('chatScreen')">💬 ส่งข้อความแชท</button>
 </div>
 
 <div class="screen" id="connectingScreen">
@@ -98,6 +111,18 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
   <div class="controls">
     <button class="ctl" id="muteBtn" onclick="toggleMute()">🎤</button>
     <button class="ctl hang" onclick="endCall()">✕</button>
+  </div>
+</div>
+
+<div class="screen" id="chatScreen">
+  <div class="chat-header">
+    <button class="back" onclick="show('home')">←</button>
+    <div><div class="name pname" style="font-size:19px;margin-top:0">น้องมะลิ</div><div class="status" style="font-size:13px">พร้อมคุยอยู่นะ</div></div>
+  </div>
+  <div id="chatBody"></div>
+  <div class="chat-input">
+    <input id="chatText" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="sendBtn" onclick="sendChat()">➤</button>
   </div>
 </div>
 
@@ -180,6 +205,7 @@ function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(id==='home')updateHint();
+  if(id==='chatScreen')resetChat();
 }
 function updateHint(){
   const h=new Date().getHours();
@@ -223,7 +249,37 @@ function saveSettings(){
   el.className='ok';el.textContent='✓ บันทึกสำเร็จ';setTimeout(()=>el.style.display='none',2500);el.style.display='block';
 }
 
-/* ===== A/B Testing State ===== */
+/* ===== แชท (Chat System) ===== */
+let chatHistory=[];
+function resetChat(){
+  chatHistory=[{role:'assistant',content:`สวัสดีจ้า 🌸 ${PERSONAS[cfg.tone].name} เอง มีอะไรคุยกับเค้าได้เสมอนะ`}];
+  renderChat();
+}
+function renderChat(){
+  const b=document.getElementById('chatBody');
+  b.innerHTML=chatHistory.map(m=>`<div class="msg ${m.role==='assistant'?'ai':'me'}">${m.content.replace(/</g,'&lt;')}</div>`).join('');
+  b.scrollTop=b.scrollHeight;
+}
+async function sendChat(){
+  const inp=document.getElementById('chatText');const text=inp.value.trim();if(!text)return;
+  inp.value='';chatHistory.push({role:'user',content:text});renderChat();
+  const key=cfg.openAiKey||cfg.geminiKey;
+  if(!key){chatHistory.push({role:'assistant',content:'(กรุณาใส่ API Key ในตั้งค่าก่อนนะ ⚙️)'});renderChat();return}
+  try{
+    const p=PERSONAS[cfg.tone];
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',headers:{'Authorization':'Bearer '+cfg.openAiKey,'Content-Type':'application/json'},
+      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:300,
+        messages:[{role:'system',content:p.style+' พูดไทย ตอบสั้นเป็นกันเอง'},...chatHistory.slice(-20)]})
+    });
+    const data=await r.json();
+    if(!r.ok)throw new Error(data.error?.message||('HTTP '+r.status));
+    chatHistory.push({role:'assistant',content:data.choices[0].message.content});
+  }catch(e){chatHistory.push({role:'assistant',content:'(เชื่อมต่อไม่ได้: '+e.message+')'});}
+  renderChat();
+}
+
+/* ===== A/B Testing Call System ===== */
 let currentSession={id:'',model:'',startTime:0,ratings:{nat:0,smooth:0,sat:0}};
 
 document.querySelectorAll('.stars').forEach(group=>{
@@ -244,7 +300,6 @@ let pc,mediaStream,dc,timerInt,maxTimer,activeModel='';
 async function startCall(){
   if(!cfg.openAiKey && !cfg.geminiKey){alert('กรุณาใส่ API Key อย่างน้อย 1 ค่ายในหน้าตั้งค่า ⚙️');return;}
   
-  // สุ่ม 50/50 ระหว่าง openai กับ gemini
   let available=[];
   if(cfg.openAiKey) available.push('openai');
   if(cfg.geminiKey) available.push('gemini');
@@ -301,7 +356,6 @@ async function startCall(){
       setupCallUI();
 
     }else{
-      // Gemini Live API WebSocket
       const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
       const ws=new WebSocket(wsUrl);
       ws.onopen=()=>{
