@@ -198,9 +198,11 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 </div>
 
 <script>
-const DEFAULT_SUPA_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
-const DEFAULT_SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";
-const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123";
+  // --- ตั้งค่า Supabase ของคุณตรงนี้ ---
+const SUPABASE_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";
+const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123"; // รหัสผ่านสำหรับเข้าหน้าแอดมิน
+
 
 const PERSONAS={
   kid:{name:'น้องมะลิ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
