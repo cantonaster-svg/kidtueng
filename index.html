@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>คิดถึง — A/B Testing & Chat Lab</title>
+<title>คิดถึง — A/B Testing & Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg-cream:#FFF8F0;--bg-peach:#FFE8D6;--primary:#FF9A76;--primary-deep:#E87B54;--sage:#8FBF9F;
-  --danger:#F2A0A0;--text-main:#3D3A38;--text-sub:#9C918B;--shadow-soft:0 8px 24px rgba(232,123,84,.18)}
+  --danger:#F2A0A0;--text-main:#3D3A38;--text-sub:#9C918B;--radius-lg:28px;--shadow-soft:0 8px 24px rgba(232,123,84,.18)}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Mitr',sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hidden;max-width:480px;margin:0 auto}
 .screen{display:none;height:100vh;flex-direction:column;position:relative}
@@ -70,15 +70,17 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 
 #settingsScreen{overflow-y:auto;background:var(--bg-cream)}
 .settings-body{padding:20px;padding-bottom:60px}
-.field{margin-bottom:24px}
-.field label{display:block;margin-bottom:8px;font-size:14px;font-weight:500}
+.field{margin-bottom:20px}
+.field label{display:block;margin-bottom:6px;font-size:14px;font-weight:500}
 .field input{width:100%;padding:12px 14px;border-radius:14px;border:1.5px solid var(--bg-peach);font-family:'Mitr';font-size:14px;background:#fff;outline:none}
 .voice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .voice-opt{border:2px solid var(--bg-peach);background:#fff;border-radius:18px;padding:12px;cursor:pointer;text-align:center}
 .voice-opt.selected{border-color:var(--primary);background:#FFF1E9}
 .voice-opt b{display:block;font-weight:500;font-size:15px}
 .voice-opt small{color:var(--text-sub);font-weight:300;display:block;font-size:13px}
-.saveBtn{width:100%;padding:14px;border-radius:99px;border:none;background:var(--primary);color:#fff;font-family:'Mitr';font-size:16px;margin-top:10px;cursor:pointer}
+.saveBtn,.testBtn{width:100%;padding:13px;border-radius:99px;border:none;font-family:'Mitr';font-size:15px;margin-top:8px;cursor:pointer}
+.saveBtn{background:var(--primary);color:#fff}
+.testBtn{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
 #statusMsg{margin-top:10px;padding:10px;border-radius:10px;font-size:13px;display:none}
 #statusMsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
 #statusMsg.err{display:block;background:#FDECEA;color:#C62828}
@@ -166,10 +168,12 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
     <div class="field">
       <label>OpenAI API Key</label>
       <input type="password" id="openAiKey" placeholder="sk-...">
+      <button class="testBtn" onclick="testApiKey('openai')">🔌 ทดสอบ OpenAI Key</button>
     </div>
     <div class="field">
       <label>Gemini API Key</label>
       <input type="password" id="geminiKey" placeholder="AIza...">
+      <button class="testBtn" onclick="testApiKey('gemini')">🔌 ทดสอบ Gemini Key</button>
     </div>
     <div class="field">
       <label>Supabase URL</label>
@@ -246,7 +250,30 @@ function saveSettings(){
   cfg.supaKey=document.getElementById('supaKey').value.trim();
   localStorage.setItem('kidtueng_ab',JSON.stringify(cfg));
   const el=document.getElementById('statusMsg');
-  el.className='ok';el.textContent='✓ บันทึกสำเร็จ';setTimeout(()=>el.style.display='none',2500);el.style.display='block';
+  el.className='ok';el.textContent='✓ บันทึกการตั้งค่าเรียบร้อย!';setTimeout(()=>el.style.display='none',2500);el.style.display='block';
+}
+
+async function testApiKey(type){
+  const el=document.getElementById('statusMsg');
+  if(type==='openai'){
+    const k=document.getElementById('openAiKey').value.trim();
+    if(!k){el.className='err';el.textContent='กรุณาใส่ OpenAI Key ก่อน';el.style.display='block';return;}
+    el.className='ok';el.textContent='กำลังทดสอบ OpenAI...';el.style.display='block';
+    try{
+      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+k}});
+      if(r.ok){el.className='ok';el.textContent='✓ OpenAI Key ใช้งานได้ปกติ!';}
+      else{el.className='err';el.textContent='✗ OpenAI Key มีปัญหา (HTTP '+r.status+')';}
+    }catch(e){el.className='err';el.textContent='✗ เชื่อมต่อ OpenAI ไม่ได้';}
+  }else{
+    const k=document.getElementById('geminiKey').value.trim();
+    if(!k){el.className='err';el.textContent='กรุณาใส่ Gemini Key ก่อน';el.style.display='block';return;}
+    el.className='ok';el.textContent='กำลังทดสอบ Gemini...';el.style.display='block';
+    try{
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=`+k);
+      if(r.ok){el.className='ok';el.textContent='✓ Gemini Key ใช้งานได้ปกติ!';}
+      else{el.className='err';el.textContent='✗ Gemini Key มีปัญหา (HTTP '+r.status+')';}
+    }catch(e){el.className='err';el.textContent='✗ เชื่อมต่อ Gemini ไม่ได้';}
+  }
 }
 
 /* ===== แชท (Chat System) ===== */
@@ -263,12 +290,12 @@ function renderChat(){
 async function sendChat(){
   const inp=document.getElementById('chatText');const text=inp.value.trim();if(!text)return;
   inp.value='';chatHistory.push({role:'user',content:text});renderChat();
-  const key=cfg.openAiKey||cfg.geminiKey;
-  if(!key){chatHistory.push({role:'assistant',content:'(กรุณาใส่ API Key ในตั้งค่าก่อนนะ ⚙️)'});renderChat();return}
+  const key=cfg.openAiKey;
+  if(!key){chatHistory.push({role:'assistant',content:'(กรุณาใส่ OpenAI API Key ในตั้งค่าก่อนนะ ⚙️)'});renderChat();return}
   try{
     const p=PERSONAS[cfg.tone];
     const r=await fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',headers:{'Authorization':'Bearer '+cfg.openAiKey,'Content-Type':'application/json'},
+      method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
       body:JSON.stringify({model:'gpt-4o-mini',max_tokens:300,
         messages:[{role:'system',content:p.style+' พูดไทย ตอบสั้นเป็นกันเอง'},...chatHistory.slice(-20)]})
     });
