@@ -198,12 +198,12 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 </div>
 
 <script>
-
-// --- ตั้งค่า Supabase ของคุณตรงนี้ ---
-const SUPABASE_URL = "https://ชื่อโปรเจกต์ของคุณ.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOi... (Anon/Public Key ยาวๆ)";
-const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123"; // รหัสผ่านสำหรับเข้าหน้าแอดมิน
-
+// ==========================================================
+// ตั้งค่า Supabase และรหัสแอดมินของคุณตรงนี้
+// ==========================================================
+const DEFAULT_SUPA_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
+const DEFAULT_SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";
+const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123"; // <-- รหัสเข้าหน้าแอดมิน
 
 const PERSONAS={
   kid:{name:'น้องมะลิ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
@@ -211,7 +211,9 @@ const PERSONAS={
 };
 
 let cfg={openAiKey:'',geminiKey:'',tone:'kid'};
-try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng_ab')||'{}')}}catch(e){}
+try{
+  cfg = {...cfg, ...JSON.parse(localStorage.getItem('kidtueng_ab')||'{}')};
+}catch(e){}
 
 if(cfg.openAiKey){ show('home'); }
 
@@ -222,6 +224,7 @@ function show(id){
   if(id==='home')updateHint();
   if(id==='chatScreen')resetChat();
 }
+
 function updateHint(){
   const h=new Date().getHours();
   document.getElementById('hint').textContent=h<11?'สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง':'วันนี้เป็นยังไงบ้าง เล่าให้ฟังหน่อย';
@@ -301,9 +304,14 @@ async function adminSetupAndSave() {
   const gemini = document.getElementById('setupGemini').value.trim();
   const pin = document.getElementById('setupPin').value.trim();
   const msg = document.getElementById('setupMsg');
-  if(!openAi || !pin){ msg.style.color='var(--danger)'; msg.textContent='กรุณาใส่ OpenAI Key และรหัสผ่านกลุ่ม'; return; }
+  
+  if(!pin){ 
+    msg.style.color='var(--danger)'; 
+    msg.textContent='กรุณาใส่รหัสผ่านกลุ่ม (Passcode) สำหรับให้ผู้ทดลองใช้'; 
+    return; 
+  }
 
-  msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัส...';
+  msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัสลง DB...';
   try {
     const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
     const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_configs`, {
