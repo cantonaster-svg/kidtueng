@@ -113,12 +113,12 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
     <h2 style="text-align:center">🛠️ จัดการระบบ (Admin Panel)</h2>
     <p style="text-align:center;margin-bottom:14px">ตั้งค่า API และรหัสผ่านกลุ่ม</p>
     <div style="margin-bottom:12px">
-      <label style="font-size:13px;font-weight:500">OpenAI API Key (เว้นว่างไว้เทสต์ก่อนได้)</label>
+      <label style="font-size:13px;font-weight:500">OpenAI API Key (เว้นว่างไว้เทสต์ DB ก่อนได้)</label>
       <input type="password" id="setupOpenAI" placeholder="sk-..." style="margin-bottom:4px">
       <button class="testBtn" onclick="testApiKey('openai')">🔌 ทดสอบ OpenAI Key</button>
     </div>
     <div style="margin-bottom:12px">
-      <label style="font-size:13px;font-weight:500">Gemini API Key (เว้นว่างไว้เทสต์ก่อนได้)</label>
+      <label style="font-size:13px;font-weight:500">Gemini API Key (เว้นว่างไว้เทสต์ DB ก่อนได้)</label>
       <input type="password" id="setupGemini" placeholder="AIza..." style="margin-bottom:4px">
       <button class="testBtn" onclick="testApiKey('gemini')">🔌 ทดสอบ Gemini Key</button>
     </div>
@@ -199,11 +199,11 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 
 <script>
 // ==========================================================
-// ตั้งค่า Supabase และรหัสแอดมินของคุณตรงนี้
+// ตั้งค่า Supabase และรหัสแอดมิน (ประกาศแบบ Global Window ป้องกันปัญหา Error)
 // ==========================================================
-const SUPABASE_URL = "https://vsitajtgbmisfwynpevx.supabase.co"; // ฝัง URL ของคุณเรียบร้อย
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";             // <-- ใส่ Anon Key ของคุณตรงนี้
-const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123";      // รหัสเข้าหน้าแอดมิน
+window.SUPABASE_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
+window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4"; // <-- ใส่ Anon Key ที่ขึ้นต้นด้วย eyJ... ตรงนี้
+const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123";
 
 const PERSONAS={
   kid:{name:'น้องมะลิ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
@@ -315,9 +315,9 @@ async function adminSetupAndSave() {
   msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัสลง DB...';
   try {
     const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_configs`, {
+    const r = await fetch(`${window.SUPABASE_URL}/rest/v1/shared_configs`, {
       method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      headers: { 'apikey': window.SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ id: 'main_config', encrypted_data: encrypted })
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
@@ -334,8 +334,8 @@ async function unlockApp() {
 
   errEl.style.display='none';
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_configs?id=eq.main_config`, {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+SUPABASE_ANON_KEY }
+    const r = await fetch(`${window.SUPABASE_URL}/rest/v1/shared_configs?id=eq.main_config`, {
+      headers: { 'apikey': window.SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY }
     });
     const rows = await r.json();
     if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูล');
@@ -453,10 +453,10 @@ async function submitFeedback(){
   const comment=document.getElementById('feedbackComment').value.trim();
   const duration=Math.floor((Date.now()-currentSession.startTime)/1000);
   document.getElementById('feedbackModal').style.display='none'; show('home');
-  if(SUPABASE_URL && SUPABASE_ANON_KEY){
+  if(window.SUPABASE_URL && window.SUPABASE_ANON_KEY){
     try{
-      await fetch(`${SUPABASE_URL}/rest/v1/ai_experiment_logs`,{
-        method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      await fetch(`${window.SUPABASE_URL}/rest/v1/ai_experiment_logs`,{
+        method:'POST',headers:{'apikey':window.SUPABASE_ANON_KEY,'Authorization':'Bearer '+window.SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
         body:JSON.stringify({session_id:currentSession.id,model_tested:currentSession.model,persona_chosen:PERSONAS[cfg.tone].name,duration_seconds:duration,naturalness:currentSession.ratings.nat,smoothness:currentSession.ratings.smooth,satisfaction:currentSession.ratings.sat,comment:comment})
       });
     }catch(e){}
