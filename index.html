@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>คิดถึง — A/B Testing Lab</title>
+<title>คิดถึง — A/B Testing & Persona Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg-cream:#FFF8F0;--bg-peach:#FFE8D6;--primary:#FF9A76;--primary-deep:#E87B54;--sage:#8FBF9F;
@@ -54,39 +54,46 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 .modal-card textarea{width:100%;height:70px;border:1.5px solid var(--bg-peach);border-radius:12px;padding:10px;font-family:'Mitr';font-size:14px;resize:none;outline:none;background:var(--bg-cream);margin-bottom:16px}
 .submitFeedback{width:100%;padding:13px;border-radius:99px;border:none;background:var(--primary);color:#fff;font-family:'Mitr';font-size:16px;cursor:pointer}
 
-#settingsScreen{overflow-y:auto}
+#settingsScreen{overflow-y:auto;background:var(--bg-cream)}
 .settings-body{padding:20px;padding-bottom:60px}
-.field{margin-bottom:20px}
-.field label{display:block;margin-bottom:6px;font-size:14px}
+.field{margin-bottom:24px}
+.field label{display:block;margin-bottom:8px;font-size:14px;font-weight:500}
 .field input{width:100%;padding:12px 14px;border-radius:14px;border:1.5px solid var(--bg-peach);font-family:'Mitr';font-size:14px;background:#fff;outline:none}
+.voice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.voice-opt{border:2px solid var(--bg-peach);background:#fff;border-radius:18px;padding:12px;cursor:pointer;text-align:center}
+.voice-opt.selected{border-color:var(--primary);background:#FFF1E9}
+.voice-opt b{display:block;font-weight:500;font-size:15px}
+.voice-opt small{color:var(--text-sub);font-weight:300;display:block;font-size:13px}
 .saveBtn{width:100%;padding:14px;border-radius:99px;border:none;background:var(--primary);color:#fff;font-family:'Mitr';font-size:16px;margin-top:10px;cursor:pointer}
 #statusMsg{margin-top:10px;padding:10px;border-radius:10px;font-size:13px;display:none}
 #statusMsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
 #statusMsg.err{display:block;background:#FDECEA;color:#C62828}
+.chat-header{padding:16px 20px;background:#fff;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.back{width:38px;height:38px;border-radius:50%;border:none;background:var(--bg-peach);cursor:pointer;font-size:16px}
 </style>
 </head>
 <body>
 
 <div class="screen active" id="home">
   <button id="settingsBtn" onclick="show('settingsScreen')">⚙️</button>
-  <div class="breath">🌸</div>
-  <div class="name">มะลิ</div>
-  <div class="status">พร้อมคุยอยู่นะ (ระบบทดสอบอัจฉริยะ)</div>
+  <div class="breath avatar">🌸</div>
+  <div class="name pname">น้องมะลิ</div>
+  <div class="status">พร้อมคุยอยู่นะ</div>
   <div class="hint-bubble" id="hint">สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง</div>
   <button id="callBtn" onclick="startCall()">📞</button>
-  <div class="under">กดโทรคุยกับมะลิ</div>
+  <div class="under" id="callUnder">กดโทรหาน้องมะลิ</div>
 </div>
 
 <div class="screen" id="connectingScreen">
-  <div class="ripple">🌸</div>
-  <div class="call-info"><div class="name">มะลิ</div><div class="call-status">กำลังต่อสายอัจฉริยะ...</div>
+  <div class="ripple avatar">🌸</div>
+  <div class="call-info"><div class="name pname">น้องมะลิ</div><div class="call-status">กำลังต่อสายอัจฉริยะ...</div>
   <div class="dots"><span></span><span></span><span></span></div></div>
   <div class="controls"><button class="ctl hang" onclick="endCall()">✕</button></div>
 </div>
 
 <div class="screen" id="callScreen">
-  <div class="ripple" style="margin-top:60px;width:120px;height:120px;font-size:42px">🌸</div>
-  <div class="call-info"><div class="name">มะลิ</div><div class="call-status" id="timer">00:00</div></div>
+  <div class="ripple avatar" style="margin-top:40px;width:120px;height:120px;font-size:42px">🌸</div>
+  <div class="call-info"><div class="name pname">น้องมะลิ</div><div class="call-status" id="timer">00:00</div></div>
   <div id="transcript">กำลังสนทนา...</div>
   <div class="controls">
     <button class="ctl" id="muteBtn" onclick="toggleMute()">🎤</button>
@@ -122,11 +129,15 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 </div>
 
 <div class="screen" id="settingsScreen">
-  <div class="chat-header" style="padding:16px 20px;background:#fff;display:flex;align-items:center;gap:14px">
-    <button class="back" onclick="show('home')" style="width:38px;height:38px;border-radius:50%;border:none;background:var(--bg-peach);cursor:pointer">←</button>
-    <div class="name" style="font-size:19px;margin-top:0">ตั้งค่าระบบทดสอบ</div>
+  <div class="chat-header">
+    <button class="back" onclick="show('home')">←</button>
+    <div class="name" style="font-size:19px;margin-top:0">ตั้งค่าคาแรคเตอร์และระบบ</div>
   </div>
   <div class="settings-body">
+    <div class="field">
+      <label>เลือกคาแรคเตอร์และเสียงของเพื่อน</label>
+      <div class="voice-grid" id="voiceGrid"></div>
+    </div>
     <div class="field">
       <label>OpenAI API Key</label>
       <input type="password" id="openAiKey" placeholder="sk-...">
@@ -146,12 +157,25 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
     <button class="saveBtn" onclick="saveSettings()">บันทึกการตั้งค่า</button>
     <div id="statusMsg"></div>
     <div class="note" style="font-size:13px;color:var(--text-sub);margin-top:14px;line-height:1.6">
-      ระบบจะสุ่มใช้งานระหว่าง OpenAI และ Gemini แบบ 50/50 อัตโนมัติทุกครั้งที่กดโทร เพื่อเก็บสถิตินำไปวิเคราะห์ธุรกิจ
+      * ระบบจะสุ่มใช้งานระหว่าง OpenAI และ Gemini แบบ 50/50 อัตโนมัติทุกครั้งที่กดโทร เพื่อเก็บสถิตินำไปวิเคราะห์ธุรกิจ
     </div>
   </div>
 </div>
 
 <script>
+const PERSONAS={
+  kid:{name:'น้องมะลิ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
+    style:'คุณคือ "น้องมะลิ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
+  woman:{name:'พี่มะลิ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่ม',
+    style:'คุณคือ "พี่มะลิ" ผู้หญิงไทยวัย 30 พูดน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี ลงท้าย "ค่ะ" "นะ"'},
+  man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
+    style:'คุณคือ "พี่กรณ์" ผู้ชายไทยวัย 30 เสียงทุ้ม นิ่ง อบอุ่น พึ่งพาได้ ใช้คำลงท้าย "ครับ" เสมอ'},
+  elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
+    style:'คุณคือ "ลุงชัย" ชายสูงวัยอายุ 60 ใจดี พูดช้า ใจเย็น สุขุม ชอบเล่าประสบการณ์ ใช้คำลงท้าย "ครับ" เรียกผู้ใช้ว่า "หลาน"'},
+  neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',desc:'เสียงกลางๆ',
+    style:'คุณคือ "ฟ้า" เพื่อนที่เป็นกลาง สุภาพ ฟังเก่ง ไม่ระบุเพศ ใช้ภาษากลางๆ ไม่ใช้ "ครับ/ค่ะ" ให้ใช้ "นะ" แทน'}
+};
+
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -164,12 +188,30 @@ function updateHint(){
     h<19?'วันนี้เป็นยังไงบ้าง เล่าให้ฟังหน่อย':'วันนี้เหนื่อยไหม คุยกันหน่อยมั้ย';
 }
 
-let cfg={openAiKey:'',geminiKey:'',supaUrl:'',supaKey:''};
+let cfg={openAiKey:'',geminiKey:'',supaUrl:'',supaKey:'',tone:'kid'};
 try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng_ab')||'{}')}}catch(e){}
+if(!PERSONAS[cfg.tone])cfg.tone='kid';
+
 document.getElementById('openAiKey').value=cfg.openAiKey;
 document.getElementById('geminiKey').value=cfg.geminiKey;
 document.getElementById('supaUrl').value=cfg.supaUrl;
 document.getElementById('supaKey').value=cfg.supaKey;
+
+function renderVoices(){
+  document.getElementById('voiceGrid').innerHTML=Object.entries(PERSONAS).map(([k,p])=>
+    `<div class="voice-opt ${k===cfg.tone?'selected':''}" onclick="pickPersona('${k}')">
+      <b>${p.emoji} ${p.name}</b><small>${p.desc}</small></div>`).join('');
+}
+function applyPersonaUI(){
+  const p=PERSONAS[cfg.tone];
+  document.querySelectorAll('.pname').forEach(e=>e.textContent=p.name);
+  document.querySelectorAll('.avatar').forEach(e=>e.textContent=p.emoji);
+  document.getElementById('callUnder').textContent='กดโทรหา'+p.name;
+}
+function pickPersona(k){
+  cfg.tone=k; renderVoices(); applyPersonaUI();
+  saveSettings();
+}
 
 function saveSettings(){
   cfg.openAiKey=document.getElementById('openAiKey').value.trim();
@@ -184,7 +226,6 @@ function saveSettings(){
 /* ===== A/B Testing State ===== */
 let currentSession={id:'',model:'',startTime:0,ratings:{nat:0,smooth:0,sat:0}};
 
-// จัดการคะแนนดาวใน Modal
 document.querySelectorAll('.stars').forEach(group=>{
   const key=group.dataset.key;
   group.querySelectorAll('.star').forEach(star=>{
@@ -203,14 +244,14 @@ let pc,mediaStream,dc,timerInt,maxTimer,activeModel='';
 async function startCall(){
   if(!cfg.openAiKey && !cfg.geminiKey){alert('กรุณาใส่ API Key อย่างน้อย 1 ค่ายในหน้าตั้งค่า ⚙️');return;}
   
-  // สุ่ม 50/50 ระหว่าง openai กับ gemini (ถ้าค่ายไหนไม่มี key ให้ใช้อีกค่าย)
+  // สุ่ม 50/50 ระหว่าง openai กับ gemini
   let available=[];
   if(cfg.openAiKey) available.push('openai');
   if(cfg.geminiKey) available.push('gemini');
   activeModel=available[Math.floor(Math.random()*available.length)];
   
   currentSession={
-    id:'sess_'+Math.random().toString(36.substring(2,9)),
+    id:'sess_'+Math.random().toString(36).substring(2,9),
     model:activeModel,
     startTime:Date.now(),
     ratings:{nat:0,smooth:0,sat:0}
@@ -220,73 +261,65 @@ async function startCall(){
 
   try{
     mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const p=PERSONAS[cfg.tone];
+    const baseRules=' พูดภาษาไทยเป็นหลัก ตอบสั้น 1-2 ประโยคเหมือนคุยโทรศัพท์จริง ถามกลับบ้าง รับฟังอารมณ์ก่อนแนะนำ';
 
     if(activeModel==='openai'){
-      await startOpenAICall();
+      const csr=await fetch('https://api.openai.com/v1/realtime/client_secrets',{
+        method:'POST',headers:{'Authorization':'Bearer '+cfg.openAiKey,'Content-Type':'application/json'},
+        body:JSON.stringify({session:{type:'realtime',model:'gpt-realtime-mini',
+          instructions:p.style+baseRules,
+          audio:{output:{voice:p.voice,speed:1.0}}
+        }})
+      });
+      if(!csr.ok)throw new Error('OpenAI Error (HTTP '+csr.status+')');
+      const secret=await csr.json();
+      const ek=secret.value||secret.client_secret?.value;
+
+      pc=new RTCPeerConnection();
+      pc.addTrack(mediaStream.getAudioTracks()[0],mediaStream);
+      const remoteAudio=document.createElement('audio');
+      remoteAudio.autoplay=true;remoteAudio.playsInline=true;document.body.appendChild(remoteAudio);
+      pc.ontrack=e=>{remoteAudio.srcObject=e.streams[0]};
+
+      dc=pc.createDataChannel('oai-events');
+      dc.onopen=()=>{dc.send(JSON.stringify({type:'response.create',response:{instructions:'ทักผู้ใช้สั้นๆ 1 ประโยคตามคาแรคเตอร์'}}));};
+      dc.onmessage=e=>{
+        const ev=JSON.parse(e.data);
+        if(ev.type==='response.audio_transcript.delta'&&ev.delta){
+          document.getElementById('transcript').textContent+=ev.delta;
+        }
+      };
+
+      const offer=await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      const ansr=await fetch('https://api.openai.com/v1/realtime/calls',{
+        method:'POST',headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},body:offer.sdp
+      });
+      if(!ansr.ok)throw new Error('OpenAI SDP Error');
+      await pc.setRemoteDescription({type:'answer',sdp:await ansr.text()});
+      setupCallUI();
+
     }else{
-      await startGeminiCall();
+      // Gemini Live API WebSocket
+      const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
+      const ws=new WebSocket(wsUrl);
+      ws.onopen=()=>{
+        ws.send(JSON.stringify({
+          setup:{
+            model:"models/gemini-2.0-flash-exp",
+            generation_config:{response_modalities:["AUDIO"],speech_config:{voice_config:{prebuilt_voice_config:{voice_name:p.voice==='coral'?'Kore':p.voice==='marin'?'Puck':'Aoede'}}}},
+            system_instruction:{parts:[{text:p.style+baseRules}]}
+          }
+        }));
+        setupCallUI();
+      };
+      ws.onerror=()=>{(alert('Gemini เชื่อมต่อไม่ได้ ตรวจสอบ API Key'));endCall();};
     }
   }catch(err){
     alert('ต่อสายไม่สำเร็จ\n\n'+err.message);
     endCall();
   }
-}
-
-async function startOpenAICall(){
-  const csr=await fetch('https://api.openai.com/v1/realtime/client_secrets',{
-    method:'POST',headers:{'Authorization':'Bearer '+cfg.openAiKey,'Content-Type':'application/json'},
-    body:JSON.stringify({session:{type:'realtime',model:'gpt-realtime-mini',
-      instructions:'คุณคือ "มะลิ" เพื่อนสาวผู้หญิงไทยวัย 30 อบอุ่น พูดจาเป็นกันเอง สั้นๆ 1-2 ประโยค',
-      audio:{output:{voice:'marin',speed:1.0}}
-    }})
-  });
-  if(!csr.ok)throw new Error('OpenAI Error (HTTP '+csr.status+')');
-  const secret=await csr.json();
-  const ek=secret.value||secret.client_secret?.value;
-
-  pc=new RTCPeerConnection();
-  pc.addTrack(mediaStream.getAudioTracks()[0],mediaStream);
-  const remoteAudio=document.createElement('audio');
-  remoteAudio.autoplay=true;remoteAudio.playsInline=true;document.body.appendChild(remoteAudio);
-  pc.ontrack=e=>{remoteAudio.srcObject=e.streams[0]};
-
-  dc=pc.createDataChannel('oai-events');
-  dc.onopen=()=>{dc.send(JSON.stringify({type:'response.create',response:{instructions:'ทักผู้ใช้สั้นๆ 1 ประโยค'}}));};
-  dc.onmessage=e=>{
-    const ev=JSON.parse(e.data);
-    if(ev.type==='response.audio_transcript.delta'&&ev.delta){
-      document.getElementById('transcript').textContent+=ev.delta;
-    }
-  };
-
-  const offer=await pc.createOffer();
-  await pc.setLocalDescription(offer);
-  const ansr=await fetch('https://api.openai.com/v1/realtime/calls',{
-    method:'POST',headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},body:offer.sdp
-  });
-  if(!ansr.ok)throw new Error('OpenAI SDP Error');
-  await pc.setRemoteDescription({type:'answer',sdp:await ansr.text()});
-
-  setupCallUI();
-}
-
-async function startGeminiCall(){
-  //จำลอง/เชื่อมต่อ Gemini Live WebSocket หรือแจ้งเตือนถ้ายังไม่พร้อมในส่วน WebRTC
-  // สำหรับ Gemini Live API บนบราวเซอร์ผ่าน WebSocket ตรง
-  const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
-  const ws=new WebSocket(wsUrl);
-  
-  ws.onopen=()=>{
-    ws.send(JSON.stringify({
-      setup:{
-        model:"models/gemini-2.0-flash-exp",
-        generation_config:{response_modalities:["AUDIO"],speech_config:{voice_config:{prebuilt_voice_config:{voice_name:"Kore"}}}},
-        system_instruction:{parts:[{text:"คุณคือมะลิ เพื่อนสาววัย 30 พูดไทยอบอุ่น เป็นกันเอง สั้นๆ"}]}
-      }
-    }));
-    setupCallUI();
-  };
-  ws.onerror=(e)=>{throw new Error('Gemini WebSocket เชื่อมต่อไม่ได้');};
 }
 
 function setupCallUI(){
@@ -297,7 +330,6 @@ function setupCallUI(){
     const s=Math.floor((Date.now()-callStart)/1000);
     document.getElementById('timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
   },1000);
-  // ตัดสายอัตโนมัติ 5 นาที คุมงบ
   maxTimer=setTimeout(()=>{alert('ครบ 5 นาทีแล้ว วางสายอัตโนมัติ');endCall();},300000);
 }
 
@@ -312,8 +344,6 @@ function endCall(){
   try{pc&&pc.close()}catch(e){}
   try{mediaStream&&mediaStream.getTracks().forEach(t=>t.stop())}catch(e){}
   pc=dc=mediaStream=null;
-  
-  // เปิด Modal ประเมินทันที
   document.getElementById('feedbackModal').style.display='flex';
 }
 
@@ -337,7 +367,7 @@ async function submitFeedback(){
         body:JSON.stringify({
           session_id:currentSession.id,
           model_tested:currentSession.model,
-          persona_chosen:'มะลิ',
+          persona_chosen:PERSONAS[cfg.tone].name,
           duration_seconds:duration,
           naturalness:currentSession.ratings.nat,
           smoothness:currentSession.ratings.smooth,
@@ -347,12 +377,13 @@ async function submitFeedback(){
       });
     }catch(e){console.error('Log error:',e);}
   }
-  // รีเซ็ตฟอร์มประเมิน
   currentSession.ratings={nat:0,smooth:0,sat:0};
   document.querySelectorAll('.star').forEach(s=>s.classList.remove('selected'));
   document.getElementById('feedbackComment').value='';
 }
 
+renderVoices();
+applyPersonaUI();
 updateHint();
 </script>
 </body>
