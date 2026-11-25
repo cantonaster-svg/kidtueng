@@ -10,16 +10,17 @@
   --danger:#F2A0A0;--text-main:#3D3A38;--text-sub:#9C918B;--shadow-soft:0 8px 24px rgba(232,123,84,.18)}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Mitr',sans-serif;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hidden;max-width:480px;margin:0 auto}
-.screen{display:none;height:100vh;flex-direction:column;position:relative}
+
+.screen{display:none;height:100vh;flex-direction:column;position:relative;overflow-y:auto}
 .screen.active{display:flex}
 
-/* Passcode Gate Screen */
-#gateScreen{align-items:center;justify-content:center;background:linear-gradient(180deg,#FFF8F0,#FFEFE3);padding:24px;text-align:center}
-.gate-card{background:#fff;width:100%;max-width:360px;border-radius:28px;padding:30px 24px;box-shadow:var(--shadow-soft)}
+.center-screen{align-items:center;justify-content:center;background:linear-gradient(180deg,#FFF8F0,#FFEFE3);padding:20px;text-align:center}
+.gate-card{background:#fff;width:100%;max-width:380px;border-radius:28px;padding:30px 24px;box-shadow:var(--shadow-soft);margin:auto}
 .gate-card h2{margin-bottom:8px;font-size:22px}
 .gate-card p{color:var(--text-sub);font-size:14px;margin-bottom:20px;font-weight:300}
-.gate-card input{width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--bg-peach);font-family:'Mitr';font-size:16px;text-align:center;outline:none;margin-bottom:16px;background:var(--bg-cream)}
+.gate-card input{width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--bg-peach);font-family:'Mitr';font-size:16px;text-align:center;outline:none;margin-bottom:12px;background:var(--bg-cream)}
 .gate-card button{width:100%;padding:14px;border-radius:99px;border:none;background:var(--primary);color:#fff;font-family:'Mitr';font-size:16px;cursor:pointer}
+.link-btn{background:none!important;color:var(--primary)!important;margin-top:12px;font-size:14px!important;text-decoration:underline;cursor:pointer;border:none}
 
 #home{align-items:center;justify-content:center;background:linear-gradient(180deg,#FFF8F0,#FFEFE3)}
 .breath,.ripple{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE8D6,#FFC7AC);
@@ -35,7 +36,7 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 #callBtn:active{transform:scale(.92)}
 .under{color:var(--text-sub);font-weight:300;margin-top:10px}
 #chatBtn{margin-top:24px;padding:12px 28px;border-radius:99px;border:1.5px solid var(--primary);background:transparent;color:var(--primary);font-family:'Mitr';font-size:15px;cursor:pointer}
-#settingsBtn{position:absolute;top:20px;right:20px;width:42px;height:42px;border-radius:50%;border:none;background:#fff;font-size:19px;box-shadow:0 3px 10px rgba(0,0,0,.06);cursor:pointer}
+
 #connectingScreen,#callScreen{background:linear-gradient(180deg,#FFEFE3,#FFDCC2);align-items:center;justify-content:center}
 .ripple::before,.ripple::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:2px solid rgba(255,154,118,.5);animation:rip 1.8s infinite}
 .ripple::after{animation-delay:.9s}
@@ -77,41 +78,61 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 .modal-card textarea{width:100%;height:70px;border:1.5px solid var(--bg-peach);border-radius:12px;padding:10px;font-family:'Mitr';font-size:14px;resize:none;outline:none;background:var(--bg-cream);margin-bottom:16px}
 .submitFeedback{width:100%;padding:13px;border-radius:99px;border:none;background:var(--primary);color:#fff;font-family:'Mitr';font-size:16px;cursor:pointer}
 
-#settingsScreen{overflow-y:auto;background:var(--bg-cream)}
-.settings-body{padding:20px;padding-bottom:60px}
-.field{margin-bottom:20px}
-.field label{display:block;margin-bottom:6px;font-size:14px;font-weight:500}
-.field input{width:100%;padding:12px 14px;border-radius:14px;border:1.5px solid var(--bg-peach);font-family:'Mitr';font-size:14px;background:#fff;outline:none}
-.voice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.voice-opt{border:2px solid var(--bg-peach);background:#fff;border-radius:18px;padding:12px;cursor:pointer;text-align:center}
-.voice-opt.selected{border-color:var(--primary);background:#FFF1E9}
-.voice-opt b{display:block;font-weight:500;font-size:15px}
-.voice-opt small{color:var(--text-sub);font-weight:300;display:block;font-size:13px}
 .actionBtn{width:100%;padding:13px;border-radius:99px;border:none;font-family:'Mitr';font-size:15px;margin-top:8px;cursor:pointer}
-.saveBtn{background:var(--primary);color:#fff}
 .dbBtn{background:#2196F3;color:#fff}
-.testBtn{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
-#statusMsg{margin-top:10px;padding:10px;border-radius:10px;font-size:13px;display:none}
-#statusMsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
-#statusMsg.err{display:block;background:#FDECEA;color:#C62828}
+.testBtn{background:#fff;color:var(--primary);border:1.5px solid var(--primary);font-size:13.5px;padding:10px;margin-bottom:10px}
 </style>
 </head>
 <body>
 
-<!-- หน้าจอกรอก Passcode สำหรับผู้ทดลอง -->
-<div class="screen active" id="gateScreen">
+<div class="screen center-screen active" id="gateScreen">
   <div class="gate-card">
     <div style="font-size:48px;margin-bottom:10px">🌸</div>
     <h2>ยินดีต้อนรับสู่ "คิดถึง"</h2>
-    <p>กรุณากรอกรหัสผ่านกลุ่ม (Passcode) ที่ผู้สร้างให้มาเพื่อเริ่มต้นใช้งาน</p>
-    <input type="password" id="gatePin" placeholder="ใส่รหัสผ่านกลุ่ม..." onkeydown="if(event.key==='Enter')unlockApp()">
+    <p>กรอกรหัสผ่านกลุ่มที่แอดมินให้มา เพื่อเริ่มใช้งาน</p>
+    <input type="password" id="gatePin" placeholder="รหัสผ่านกลุ่มผู้ทดลอง..." onkeydown="if(event.key==='Enter')unlockApp()">
     <button onclick="unlockApp()">เข้าสู่ระบบทดสอบ</button>
-    <div id="gateError" style="color:var(--danger);font-size:13px;margin-top:10px;display:none">รหัสผ่านไม่ถูกต้อง หรือยังไม่ได้ตั้งค่าในระบบ</div>
+    <div id="gateError" style="color:var(--danger);font-size:13px;margin-top:10px;display:none">รหัสผ่านไม่ถูกต้อง</div>
+    <button class="link-btn" onclick="show('adminLoginScreen')">⚙️ สำหรับแอดมิน (ตั้งค่าระบบ)</button>
+  </div>
+</div>
+
+<div class="screen center-screen" id="adminLoginScreen">
+  <div class="gate-card" style="max-width:360px">
+    <h2>🔐 เข้าสู่ระบบแอดมิน</h2>
+    <p>กรอกรหัสผ่านแอดมินของคุณเพื่อจัดการระบบ</p>
+    <input type="password" id="adminPasswordInput" placeholder="รหัสผ่านแอดมิน..." onkeydown="if(event.key==='Enter')verifyAdmin()">
+    <button class="dbBtn" onclick="verifyAdmin()" style="margin-bottom:10px">ยืนยันรหัสแอดมิน</button>
+    <button class="link-btn" onclick="show('gateScreen')">← กลับหน้าหลัก</button>
+    <div id="adminLoginError" style="color:var(--danger);font-size:13px;margin-top:10px;display:none">รหัสผ่านแอดมินไม่ถูกต้อง</div>
+  </div>
+</div>
+
+<div class="screen center-screen" id="setupScreen">
+  <div class="gate-card" style="max-width:380px;text-align:left">
+    <h2 style="text-align:center">🛠️ จัดการระบบ (Admin Panel)</h2>
+    <p style="text-align:center;margin-bottom:14px">ตั้งค่า API และรหัสผ่านกลุ่ม</p>
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;font-weight:500">OpenAI API Key</label>
+      <input type="password" id="setupOpenAI" placeholder="sk-..." style="margin-bottom:4px">
+      <button class="testBtn" onclick="testApiKey('openai')">🔌 ทดสอบ OpenAI Key</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;font-weight:500">Gemini API Key</label>
+      <input type="password" id="setupGemini" placeholder="AIza..." style="margin-bottom:4px">
+      <button class="testBtn" onclick="testApiKey('gemini')">🔌 ทดสอบ Gemini Key</button>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:13px;font-weight:500">รหัสผ่านกลุ่ม (สำหรับผู้ทดลองกรอก)</label>
+      <input type="password" id="setupPin" placeholder="เช่น 1234" style="margin-bottom:6px">
+    </div>
+    <button class="dbBtn" onclick="adminSetupAndSave()" style="margin-bottom:8px">⬆️ บันทึกและเข้ารหัสขึ้น DB</button>
+    <button class="link-btn" onclick="show('gateScreen')" style="display:block;width:100%;text-align:center">← กลับไปหน้าแรก</button>
+    <div id="setupMsg" style="font-size:13px;margin-top:10px;text-align:center"></div>
   </div>
 </div>
 
 <div class="screen" id="home">
-  <button id="settingsBtn" onclick="show('settingsScreen')">⚙️</button>
   <div class="breath avatar">🌸</div>
   <div class="name pname">น้องมะลิ</div>
   <div class="status">พร้อมคุยอยู่นะ</div>
@@ -121,14 +142,14 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
   <button id="chatBtn" onclick="show('chatScreen')">💬 ส่งข้อความแชท</button>
 </div>
 
-<div class="screen" id="connectingScreen">
+<div class="screen center-screen" id="connectingScreen">
   <div class="ripple avatar">🌸</div>
   <div class="call-info"><div class="name pname">น้องมะลิ</div><div class="call-status">กำลังต่อสายอัจฉริยะ...</div>
   <div class="dots"><span></span><span></span><span></span></div></div>
   <div class="controls"><button class="ctl hang" onclick="endCall()">✕</button></div>
 </div>
 
-<div class="screen" id="callScreen">
+<div class="screen center-screen" id="callScreen">
   <div class="ripple avatar" style="margin-top:40px;width:120px;height:120px;font-size:42px">🌸</div>
   <div class="call-info"><div class="name pname">น้องมะลิ</div><div class="call-status" id="timer">00:00</div></div>
   <div id="transcript">กำลังสนทนา...</div>
@@ -150,7 +171,6 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
   </div>
 </div>
 
-<!-- Modal ประเมินหลังวางสาย -->
 <div id="feedbackModal">
   <div class="modal-card">
     <h3>ประเมินการสนทนา</h3>
@@ -177,115 +197,33 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
   </div>
 </div>
 
-<div class="screen" id="settingsScreen">
-  <div class="chat-header">
-    <button class="back" onclick="show('home')">←</button>
-    <div class="name" style="font-size:19px;margin-top:0">ตั้งค่าผู้สร้าง (Admin)</div>
-  </div>
-  <div class="settings-body">
-    <div class="field">
-      <label>เลือกคาแรคเตอร์และเสียงของเพื่อน</label>
-      <div class="voice-grid" id="voiceGrid"></div>
-    </div>
-    <div class="field">
-      <label>OpenAI API Key</label>
-      <input type="password" id="openAiKey" placeholder="sk-...">
-      <button class="testBtn" onclick="testApiKey('openai')">🔌 ทดสอบ OpenAI Key</button>
-    </div>
-    <div class="field">
-      <label>Gemini API Key</label>
-      <input type="password" id="geminiKey" placeholder="AIza...">
-      <button class="testBtn" onclick="testApiKey('gemini')">🔌 ทดสอบ Gemini Key</button>
-    </div>
-    <div class="field">
-      <label>Supabase URL</label>
-      <input type="text" id="supaUrl" placeholder="https://xxx.supabase.co">
-    </div>
-    <div class="field">
-      <label>Supabase Anon Key</label>
-      <input type="password" id="supaKey" placeholder="eyJ...">
-    </div>
-    <div class="field" style="background:#FFF3E0;padding:14px;border-radius:14px;border:1.5px dashed #FFB74D">
-      <label style="color:#E65100;font-weight:500">🔒 รหัสผ่านกลุ่มทดลอง (Master Passcode)</label>
-      <input type="password" id="masterPin" placeholder="เช่น 1234">
-      <button class="actionBtn dbBtn" onclick="encryptAndSaveToDB()">⬆️ เข้ารหัสและบันทึกขึ้น DB</button>
-    </div>
-    <button class="actionBtn saveBtn" onclick="saveSettings()">บันทึกการตั้งค่าในเครื่อง</button>
-    <div id="statusMsg"></div>
-  </div>
-</div>
-
 <script>
-// --- ตั้งค่า Supabase พื้นฐาน (ใส่ของคุณตรงนี้เพื่อให้ผู้ทดลองไม่ต้องกรอก) ---
 const DEFAULT_SUPA_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
 const DEFAULT_SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";
+const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123";
 
 const PERSONAS={
   kid:{name:'น้องมะลิ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
-    style:'คุณคือ "น้องมะลิ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
-  woman:{name:'พี่มะลิ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่ม',
-    style:'คุณคือ "พี่มะลิ" ผู้หญิงไทยวัย 30 พูดน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี ลงท้าย "ค่ะ" "นะ"'},
-  man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
-    style:'คุณคือ "พี่กรณ์" ผู้ชายไทยวัย 30 เสียงทุ้ม นิ่ง อบอุ่น พึ่งพาได้ ใช้คำลงท้าย "ครับ" เสมอ'},
-  elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
-    style:'คุณคือ "ลุงชัย" ชายสูงวัยอายุ 60 ใจดี พูดช้า ใจเย็น สุขุม ชอบเล่าประสบการณ์ ใช้คำลงท้าย "ครับ" เรียกผู้ใช้ว่า "หลาน"'},
-  neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',desc:'เสียงกลางๆ',
-    style:'คุณคือ "ฟ้า" เพื่อนที่เป็นกลาง สุภาพ ฟังเก่ง ไม่ระบุเพศ ใช้ภาษากลางๆ ไม่ใช้ "ครับ/ค่ะ" ให้ใช้ "นะ" แทน'}
+    style:'คุณคือ "น้องมะลิ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'}
 };
+
+let cfg={openAiKey:'',geminiKey:'',tone:'kid'};
+try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng_ab')||'{}')}}catch(e){}
+
+if(cfg.openAiKey){ show('home'); }
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const target = document.getElementById(id);
+  if(target) target.classList.add('active');
   if(id==='home')updateHint();
   if(id==='chatScreen')resetChat();
 }
 function updateHint(){
   const h=new Date().getHours();
-  document.getElementById('hint').textContent=
-    h<11?'สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง':h<15?'กลางวันแล้ว กินข้าวหรือยังนะ':
-    h<19?'วันนี้เป็นยังไงบ้าง เล่าให้ฟังหน่อย':'วันนี้เหนื่อยไหม คุยกันหน่อยมั้ย';
+  document.getElementById('hint').textContent=h<11?'สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง':'วันนี้เป็นยังไงบ้าง เล่าให้ฟังหน่อย';
 }
 
-let cfg={openAiKey:'',geminiKey:'',supaUrl:DEFAULT_SUPA_URL,supaKey:DEFAULT_SUPA_KEY,tone:'kid'};
-try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng_ab')||'{}')}}catch(e){}
-if(!PERSONAS[cfg.tone])cfg.tone='kid';
-
-document.getElementById('openAiKey').value=cfg.openAiKey;
-document.getElementById('geminiKey').value=cfg.geminiKey;
-document.getElementById('supaUrl').value=cfg.supaUrl || DEFAULT_SUPA_URL;
-document.getElementById('supaKey').value=cfg.supaKey || DEFAULT_SUPA_KEY;
-
-// เช็คว่าเคยปลดล็อกหรือยัง ถ้าเคยแล้วเข้าหน้าแรกเลย
-if(cfg.openAiKey || cfg.geminiKey){
-  show('home');
-}
-
-function renderVoices(){
-  document.getElementById('voiceGrid').innerHTML=Object.entries(PERSONAS).map(([k,p])=>
-    `<div class="voice-opt ${k===cfg.tone?'selected':''}" onclick="pickPersona('${k}')">
-      <b>${p.emoji} ${p.name}</b><small>${p.desc}</small></div>`).join('');
-}
-function applyPersonaUI(){
-  const p=PERSONAS[cfg.tone];
-  document.querySelectorAll('.pname').forEach(e=>e.textContent=p.name);
-  document.querySelectorAll('.avatar').forEach(e=>e.textContent=p.emoji);
-  document.getElementById('callUnder').textContent='กดโทรหา'+p.name;
-}
-function pickPersona(k){
-  cfg.tone=k; renderVoices(); applyPersonaUI(); saveSettings();
-}
-
-function saveSettings(){
-  cfg.openAiKey=document.getElementById('openAiKey').value.trim();
-  cfg.geminiKey=document.getElementById('geminiKey').value.trim();
-  cfg.supaUrl=document.getElementById('supaUrl').value.trim();
-  cfg.supaKey=document.getElementById('supaKey').value.trim();
-  localStorage.setItem('kidtueng_ab',JSON.stringify(cfg));
-  const el=document.getElementById('statusMsg');
-  if(el){ el.className='ok';el.textContent='✓ บันทึกสำเร็จ';setTimeout(()=>el.style.display='none',2500);el.style.display='block'; }
-}
-
-/* ===== ระบบเข้ารหัส / ถอดรหัส ===== */
 async function deriveKey(passcode, salt) {
   const enc = new TextEncoder();
   const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(passcode), {name: "PBKDF2"}, false, ["deriveKey"]);
@@ -320,31 +258,63 @@ async function decryptData(base64Str, passcode) {
   } catch(e) { return null; }
 }
 
-// ผู้สร้างกดบันทึกขึ้น DB
-async function encryptAndSaveToDB() {
-  saveSettings();
-  const pin = document.getElementById('masterPin').value.trim();
-  const el = document.getElementById('statusMsg');
-  if(!pin){ el.className='err'; el.textContent='กรุณาใส่รหัสผ่านกลุ่มก่อนเข้ารหัส'; el.style.display='block'; return; }
-  
-  el.className='ok'; el.textContent='กำลังเข้ารหัสและบันทึกขึ้น Supabase...'; el.style.display='block';
-  try {
-    const secretPayload = { openAiKey: cfg.openAiKey, geminiKey: cfg.geminiKey };
-    const encrypted = await encryptData(secretPayload, pin);
-
-    const r = await fetch(`${cfg.supaUrl}/rest/v1/shared_configs`, {
-      method: 'POST',
-      headers: { 'apikey': cfg.supaKey, 'Authorization': 'Bearer '+cfg.supaKey, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ id: 'main_config', encrypted_data: encrypted })
-    });
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    el.className='ok'; el.textContent='✓ เข้ารหัสและบันทึกขึ้น DB สำเร็จ!';
-  } catch(e) {
-    el.className='err'; el.textContent='✗ บันทึกไม่สำเร็จ: '+e.message;
+function verifyAdmin(){
+  const pwd = document.getElementById('adminPasswordInput').value.trim();
+  const errEl = document.getElementById('adminLoginError');
+  if(pwd === ADMIN_SECRET_PASSWORD){
+    errEl.style.display='none';
+    document.getElementById('adminPasswordInput').value='';
+    document.getElementById('setupOpenAI').value = cfg.openAiKey || '';
+    document.getElementById('setupGemini').value = cfg.geminiKey || '';
+    show('setupScreen');
+  } else {
+    errEl.style.display='block';
   }
 }
 
-// ผู้ทดลองกรอก Passcode หน้าแรก เพื่อโหลดอัตโนมัติ
+async function testApiKey(type){
+  const msg = document.getElementById('setupMsg');
+  const k = type==='openai' ? document.getElementById('setupOpenAI').value.trim() : document.getElementById('setupGemini').value.trim();
+  if(!k){ msg.style.color='var(--danger)'; msg.textContent=`กรุณาใส่ ${type.toUpperCase()} Key ก่อนทดสอบ`; return; }
+  msg.style.color='var(--text-sub)'; msg.textContent=`กำลังทดสอบ ${type.toUpperCase()}...`;
+  try{
+    const url = type==='openai' ? 'https://api.openai.com/v1/models' : 'https://generativelanguage.googleapis.com/v1beta/models?key='+k;
+    const r = await fetch(url, {headers: type==='openai'?{'Authorization':'Bearer '+k}:{}});
+    if(r.ok){
+      msg.style.color='var(--sage)';
+      msg.textContent=`✓ ${type.toUpperCase()} Key ใช้งานได้ปกติ!`;
+    } else {
+      msg.style.color='var(--danger)';
+      msg.textContent=`✗ ${type.toUpperCase()} Key มีปัญหา (HTTP ${r.status})`;
+    }
+  }catch(e){
+    msg.style.color='var(--danger)';
+    msg.textContent=`✗ เชื่อมต่อ ${type.toUpperCase()} ไม่ได้`;
+  }
+}
+
+async function adminSetupAndSave() {
+  const openAi = document.getElementById('setupOpenAI').value.trim();
+  const gemini = document.getElementById('setupGemini').value.trim();
+  const pin = document.getElementById('setupPin').value.trim();
+  const msg = document.getElementById('setupMsg');
+  if(!openAi || !pin){ msg.style.color='var(--danger)'; msg.textContent='กรุณาใส่ OpenAI Key และรหัสผ่านกลุ่ม'; return; }
+
+  msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัส...';
+  try {
+    const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_configs`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ id: 'main_config', encrypted_data: encrypted })
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    msg.style.color='var(--sage)'; msg.textContent='✓ บันทึกสำเร็จ!';
+  } catch(e) {
+    msg.style.color='var(--danger)'; msg.textContent='✗ บันทึกไม่สำเร็จ: '+e.message;
+  }
+}
+
 async function unlockApp() {
   const pin = document.getElementById('gatePin').value.trim();
   const errEl = document.getElementById('gateError');
@@ -352,8 +322,8 @@ async function unlockApp() {
 
   errEl.style.display='none';
   try {
-    const r = await fetch(`${DEFAULT_SUPA_URL}/rest/v1/shared_configs?id=eq.main_config`, {
-      headers: { 'apikey': DEFAULT_SUPA_KEY, 'Authorization': 'Bearer '+DEFAULT_SUPA_KEY }
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_configs?id=eq.main_config`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+SUPABASE_ANON_KEY }
     });
     const rows = await r.json();
     if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูล');
@@ -363,39 +333,22 @@ async function unlockApp() {
 
     cfg.openAiKey = decrypted.openAiKey || '';
     cfg.geminiKey = decrypted.geminiKey || '';
-    cfg.supaUrl = DEFAULT_SUPA_URL;
-    cfg.supaKey = DEFAULT_SUPA_KEY;
-    saveSettings();
-
+    localStorage.setItem('kidtueng_ab',JSON.stringify(cfg));
     show('home');
   } catch(e) {
-    errEl.textContent='รหัสผ่านไม่ถูกต้อง หรือเชื่อมต่อไม่ได้';
+    errEl.textContent='รหัสผ่านกลุ่มไม่ถูกต้อง';
     errEl.style.display='block';
   }
 }
 
-async function testApiKey(type){
-  const el=document.getElementById('statusMsg');
-  const k = type==='openai' ? document.getElementById('openAiKey').value.trim() : document.getElementById('geminiKey').value.trim();
-  if(!k){el.className='err';el.textContent='กรุณาใส่ Key ก่อน';el.style.display='block';return;}
-  el.className='ok';el.textContent='กำลังทดสอบ...';el.style.display='block';
-  try{
-    const url = type==='openai' ? 'https://api.openai.com/v1/models' : 'https://generativelanguage.googleapis.com/v1beta/models?key='+k;
-    const r=await fetch(url,{headers: type==='openai'?{'Authorization':'Bearer '+k}:{}});
-    if(r.ok){el.className='ok';el.textContent=`✓ ${type.toUpperCase()} Key ใช้ได้ปกติ!`;}
-    else{el.className='err';el.textContent=`✗ ${type.toUpperCase()} Key มีปัญหา`;}
-  }catch(e){el.className='err';el.textContent='✗ เชื่อมต่อไม่ได้';}
-}
-
-// --- โค้ดแชทและโทรเหมือนเดิม ---
 let chatHistory=[];
 function resetChat(){
-  chatHistory=[{role:'assistant',content:`สวัสดีจ้า 🌸 ${PERSONAS[cfg.tone].name} เอง มีอะไรคุยกับเค้าได้เสมอนะ`}];
+  chatHistory=[{role:'assistant',content:`สวัสดีจ้า 🌸 น้องมะลิเอง มีอะไรคุยกับเค้าได้เสมอนะ`}];
   renderChat();
 }
 function renderChat(){
   const b=document.getElementById('chatBody');
-  b.innerHTML=chatHistory.map(m=>`<div class="msg ${m.role==='assistant'?'ai':'me'}">${m.content.replace(/</g,'&lt;')}</div>`).join('');
+  b.innerHTML=chatHistory.map(m=>`<div class="msg ${m.role==='assistant'?'ai':'me'}">${m.content}</div>`).join('');
   b.scrollTop=b.scrollHeight;
 }
 async function sendChat(){
@@ -404,11 +357,9 @@ async function sendChat(){
   const key=cfg.openAiKey;
   if(!key){chatHistory.push({role:'assistant',content:'(ยังไม่ได้ใส่ API Key)'});renderChat();return}
   try{
-    const p=PERSONAS[cfg.tone];
     const r=await fetch('https://api.openai.com/v1/chat/completions',{
       method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:300,
-        messages:[{role:'system',content:p.style+' พูดไทย ตอบสั้นเป็นกันเอง'},...chatHistory.slice(-20)]})
+      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:300,messages:[{role:'system',content:'พูดไทย ตอบสั้น'},...chatHistory.slice(-20)]})
     });
     const data=await r.json();
     chatHistory.push({role:'assistant',content:data.choices[0].message.content});
@@ -439,12 +390,10 @@ async function startCall(){
   show('connectingScreen');
   try{
     mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    const p=PERSONAS[cfg.tone];
-    const baseRules=' พูดภาษาไทยเป็นหลัก ตอบสั้น 1-2 ประโยคเหมือนคุยโทรศัพท์จริง ถามกลับบ้าง รับฟังอารมณ์ก่อนแนะนำ';
     if(activeModel==='openai'){
       const csr=await fetch('https://api.openai.com/v1/realtime/client_secrets',{
         method:'POST',headers:{'Authorization':'Bearer '+cfg.openAiKey,'Content-Type':'application/json'},
-        body:JSON.stringify({session:{type:'realtime',model:'gpt-realtime-mini',instructions:p.style+baseRules,audio:{output:{voice:p.voice,speed:1.0}}}})
+        body:JSON.stringify({session:{type:'realtime',model:'gpt-realtime-mini',instructions:'พูดไทย',audio:{output:{voice:'coral',speed:1.0}}}})
       });
       if(!csr.ok)throw new Error('OpenAI Error');
       const secret=await csr.json(); const ek=secret.value||secret.client_secret?.value;
@@ -452,11 +401,6 @@ async function startCall(){
       const remoteAudio=document.createElement('audio'); remoteAudio.autoplay=true; remoteAudio.playsInline=true; document.body.appendChild(remoteAudio);
       pc.ontrack=e=>{remoteAudio.srcObject=e.streams[0]};
       dc=pc.createDataChannel('oai-events');
-      dc.onopen=()=>{dc.send(JSON.stringify({type:'response.create',response:{instructions:'ทักผู้ใช้สั้นๆ'}}));};
-      dc.onmessage=e=>{
-        const ev=JSON.parse(e.data);
-        if(ev.type==='response.audio_transcript.delta'&&ev.delta) document.getElementById('transcript').textContent+=ev.delta;
-      };
       const offer=await pc.createOffer(); await pc.setLocalDescription(offer);
       const ansr=await fetch('https://api.openai.com/v1/realtime/calls',{method:'POST',headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},body:offer.sdp});
       if(!ansr.ok)throw new Error('SDP Error');
@@ -465,10 +409,7 @@ async function startCall(){
     }else{
       const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
       const ws=new WebSocket(wsUrl);
-      ws.onopen=()=>{
-        ws.send(JSON.stringify({setup:{model:"models/gemini-2.0-flash-exp",generation_config:{response_modalities:["AUDIO"]},system_instruction:{parts:[{text:p.style+baseRules}]}}}));
-        setupCallUI();
-      };
+      ws.onopen=()=>{ setupCallUI(); };
       ws.onerror=()=>{alert('Gemini เชื่อมต่อไม่ได้');endCall();};
     }
   }catch(err){alert('ต่อสายไม่สำเร็จ\n\n'+err.message);endCall();}
@@ -481,7 +422,7 @@ function setupCallUI(){
     const s=Math.floor((Date.now()-callStart)/1000);
     document.getElementById('timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
   },1000);
-  maxTimer=setTimeout(()=>{alert('ครบ 5 นาทีแล้ว วางสายอัตโนมัติ');endCall();},300000);
+  maxTimer=setTimeout(()=>{alert('ครบ 5 นาทีแล้ว');endCall();},300000);
 }
 
 function toggleMute(){
@@ -500,10 +441,10 @@ async function submitFeedback(){
   const comment=document.getElementById('feedbackComment').value.trim();
   const duration=Math.floor((Date.now()-currentSession.startTime)/1000);
   document.getElementById('feedbackModal').style.display='none'; show('home');
-  if(cfg.supaUrl && cfg.supaKey){
+  if(SUPABASE_URL && SUPABASE_ANON_KEY){
     try{
-      await fetch(`${cfg.supaUrl}/rest/v1/ai_experiment_logs`,{
-        method:'POST',headers:{'apikey':cfg.supaKey,'Authorization':'Bearer '+cfg.supaKey,'Content-Type':'application/json','Prefer':'return=minimal'},
+      await fetch(`${SUPABASE_URL}/rest/v1/ai_experiment_logs`,{
+        method:'POST',headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
         body:JSON.stringify({session_id:currentSession.id,model_tested:currentSession.model,persona_chosen:PERSONAS[cfg.tone].name,duration_seconds:duration,naturalness:currentSession.ratings.nat,smoothness:currentSession.ratings.smooth,satisfaction:currentSession.ratings.sat,comment:comment})
       });
     }catch(e){}
@@ -513,7 +454,7 @@ async function submitFeedback(){
   document.getElementById('feedbackComment').value='';
 }
 
-renderVoices(); applyPersonaUI(); updateHint();
+updateHint();
 </script>
 </body>
 </html>
