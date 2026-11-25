@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>คิดถึง — Secure Shared Lab</title>
+<title>คิดถึง — AI Lab & Testing</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg-cream:#FFF8F0;--bg-peach:#FFE8D6;--primary:#FF9A76;--primary-deep:#E87B54;--sage:#8FBF9F;
@@ -12,6 +12,15 @@
 body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hidden;max-width:480px;margin:0 auto}
 .screen{display:none;height:100vh;flex-direction:column;position:relative}
 .screen.active{display:flex}
+
+/* Passcode Gate Screen */
+#gateScreen{align-items:center;justify-content:center;background:linear-gradient(180deg,#FFF8F0,#FFEFE3);padding:24px;text-align:center}
+.gate-card{background:#fff;width:100%;max-width:360px;border-radius:28px;padding:30px 24px;box-shadow:var(--shadow-soft)}
+.gate-card h2{margin-bottom:8px;font-size:22px}
+.gate-card p{color:var(--text-sub);font-size:14px;margin-bottom:20px;font-weight:300}
+.gate-card input{width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--bg-peach);font-family:'Mitr';font-size:16px;text-align:center;outline:none;margin-bottom:16px;background:var(--bg-cream)}
+.gate-card button{width:100%;padding:14px;border-radius:99px;border:none;background:var(--primary);color:#fff;font-family:'Mitr';font-size:16px;cursor:pointer}
+
 #home{align-items:center;justify-content:center;background:linear-gradient(180deg,#FFF8F0,#FFEFE3)}
 .breath,.ripple{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE8D6,#FFC7AC);
   display:flex;align-items:center;justify-content:center;font-size:56px;box-shadow:var(--shadow-soft);position:relative}
@@ -81,7 +90,6 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 .actionBtn{width:100%;padding:13px;border-radius:99px;border:none;font-family:'Mitr';font-size:15px;margin-top:8px;cursor:pointer}
 .saveBtn{background:var(--primary);color:#fff}
 .dbBtn{background:#2196F3;color:#fff}
-.loadBtn{background:#4CAF50;color:#fff}
 .testBtn{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
 #statusMsg{margin-top:10px;padding:10px;border-radius:10px;font-size:13px;display:none}
 #statusMsg.ok{display:block;background:#E8F5E9;color:#2E7D32}
@@ -90,7 +98,19 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 </head>
 <body>
 
-<div class="screen active" id="home">
+<!-- หน้าจอกรอก Passcode สำหรับผู้ทดลอง -->
+<div class="screen active" id="gateScreen">
+  <div class="gate-card">
+    <div style="font-size:48px;margin-bottom:10px">🌸</div>
+    <h2>ยินดีต้อนรับสู่ "คิดถึง"</h2>
+    <p>กรุณากรอกรหัสผ่านกลุ่ม (Passcode) ที่ผู้สร้างให้มาเพื่อเริ่มต้นใช้งาน</p>
+    <input type="password" id="gatePin" placeholder="ใส่รหัสผ่านกลุ่ม..." onkeydown="if(event.key==='Enter')unlockApp()">
+    <button onclick="unlockApp()">เข้าสู่ระบบทดสอบ</button>
+    <div id="gateError" style="color:var(--danger);font-size:13px;margin-top:10px;display:none">รหัสผ่านไม่ถูกต้อง หรือยังไม่ได้ตั้งค่าในระบบ</div>
+  </div>
+</div>
+
+<div class="screen" id="home">
   <button id="settingsBtn" onclick="show('settingsScreen')">⚙️</button>
   <div class="breath avatar">🌸</div>
   <div class="name pname">น้องมะลิ</div>
@@ -160,7 +180,7 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 <div class="screen" id="settingsScreen">
   <div class="chat-header">
     <button class="back" onclick="show('home')">←</button>
-    <div class="name" style="font-size:19px;margin-top:0">ตั้งค่าคาแรคเตอร์และระบบ</div>
+    <div class="name" style="font-size:19px;margin-top:0">ตั้งค่าผู้สร้าง (Admin)</div>
   </div>
   <div class="settings-body">
     <div class="field">
@@ -187,9 +207,8 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
     </div>
     <div class="field" style="background:#FFF3E0;padding:14px;border-radius:14px;border:1.5px dashed #FFB74D">
       <label style="color:#E65100;font-weight:500">🔒 รหัสผ่านกลุ่มทดลอง (Master Passcode)</label>
-      <input type="password" id="masterPin" placeholder="ตั้งรหัส เช่น 1234 หรือคีย์ลับกลุ่ม">
-      <button class="actionBtn dbBtn" onclick="encryptAndSaveToDB()">⬆️ เข้ารหัสและบันทึกขึ้น DB (สำหรับผู้สร้าง)</button>
-      <button class="actionBtn loadBtn" onclick="loadAndDecryptFromDB()">⬇️ โหลดค่าจาก DB ด้วยรหัส (สำหรับผู้ทดลอง)</button>
+      <input type="password" id="masterPin" placeholder="เช่น 1234">
+      <button class="actionBtn dbBtn" onclick="encryptAndSaveToDB()">⬆️ เข้ารหัสและบันทึกขึ้น DB</button>
     </div>
     <button class="actionBtn saveBtn" onclick="saveSettings()">บันทึกการตั้งค่าในเครื่อง</button>
     <div id="statusMsg"></div>
@@ -197,6 +216,10 @@ body{background:var(--bg-cream);color:var(--text-main);height:100vh;overflow:hid
 </div>
 
 <script>
+// --- ตั้งค่า Supabase พื้นฐาน (ใส่ของคุณตรงนี้เพื่อให้ผู้ทดลองไม่ต้องกรอก) ---
+const DEFAULT_SUPA_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
+const DEFAULT_SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";
+
 const PERSONAS={
   kid:{name:'น้องมะลิ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
     style:'คุณคือ "น้องมะลิ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
@@ -223,14 +246,19 @@ function updateHint(){
     h<19?'วันนี้เป็นยังไงบ้าง เล่าให้ฟังหน่อย':'วันนี้เหนื่อยไหม คุยกันหน่อยมั้ย';
 }
 
-let cfg={openAiKey:'',geminiKey:'',supaUrl:'',supaKey:'',tone:'kid'};
+let cfg={openAiKey:'',geminiKey:'',supaUrl:DEFAULT_SUPA_URL,supaKey:DEFAULT_SUPA_KEY,tone:'kid'};
 try{cfg={...cfg,...JSON.parse(localStorage.getItem('kidtueng_ab')||'{}')}}catch(e){}
 if(!PERSONAS[cfg.tone])cfg.tone='kid';
 
 document.getElementById('openAiKey').value=cfg.openAiKey;
 document.getElementById('geminiKey').value=cfg.geminiKey;
-document.getElementById('supaUrl').value=cfg.supaUrl;
-document.getElementById('supaKey').value=cfg.supaKey;
+document.getElementById('supaUrl').value=cfg.supaUrl || DEFAULT_SUPA_URL;
+document.getElementById('supaKey').value=cfg.supaKey || DEFAULT_SUPA_KEY;
+
+// เช็คว่าเคยปลดล็อกหรือยัง ถ้าเคยแล้วเข้าหน้าแรกเลย
+if(cfg.openAiKey || cfg.geminiKey){
+  show('home');
+}
 
 function renderVoices(){
   document.getElementById('voiceGrid').innerHTML=Object.entries(PERSONAS).map(([k,p])=>
@@ -244,8 +272,7 @@ function applyPersonaUI(){
   document.getElementById('callUnder').textContent='กดโทรหา'+p.name;
 }
 function pickPersona(k){
-  cfg.tone=k; renderVoices(); applyPersonaUI();
-  saveSettings();
+  cfg.tone=k; renderVoices(); applyPersonaUI(); saveSettings();
 }
 
 function saveSettings(){
@@ -255,10 +282,10 @@ function saveSettings(){
   cfg.supaKey=document.getElementById('supaKey').value.trim();
   localStorage.setItem('kidtueng_ab',JSON.stringify(cfg));
   const el=document.getElementById('statusMsg');
-  el.className='ok';el.textContent='✓ บันทึกการตั้งค่าในเครื่องแล้ว';setTimeout(()=>el.style.display='none',2500);el.style.display='block';
+  if(el){ el.className='ok';el.textContent='✓ บันทึกสำเร็จ';setTimeout(()=>el.style.display='none',2500);el.style.display='block'; }
 }
 
-/* ===== ระบบเข้ารหัส / ถอดรหัสด้วย Master Passcode ===== */
+/* ===== ระบบเข้ารหัส / ถอดรหัส ===== */
 async function deriveKey(passcode, salt) {
   const enc = new TextEncoder();
   const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(passcode), {name: "PBKDF2"}, false, ["deriveKey"]);
@@ -293,13 +320,13 @@ async function decryptData(base64Str, passcode) {
   } catch(e) { return null; }
 }
 
+// ผู้สร้างกดบันทึกขึ้น DB
 async function encryptAndSaveToDB() {
   saveSettings();
   const pin = document.getElementById('masterPin').value.trim();
   const el = document.getElementById('statusMsg');
-  if(!pin){ el.className='err'; el.textContent='กรุณาใส่รหัสผ่านกลุ่ม (Master Passcode) ก่อนเข้ารหัส'; el.style.display='block'; return; }
-  if(!cfg.supaUrl || !cfg.supaKey){ el.className='err'; el.textContent='กรุณาใส่ Supabase URL และ Anon Key ก่อน'; el.style.display='block'; return; }
-
+  if(!pin){ el.className='err'; el.textContent='กรุณาใส่รหัสผ่านกลุ่มก่อนเข้ารหัส'; el.style.display='block'; return; }
+  
   el.className='ok'; el.textContent='กำลังเข้ารหัสและบันทึกขึ้น Supabase...'; el.style.display='block';
   try {
     const secretPayload = { openAiKey: cfg.openAiKey, geminiKey: cfg.geminiKey };
@@ -310,41 +337,40 @@ async function encryptAndSaveToDB() {
       headers: { 'apikey': cfg.supaKey, 'Authorization': 'Bearer '+cfg.supaKey, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ id: 'main_config', encrypted_data: encrypted })
     });
-    if(!r.ok) throw new Error('บันทึกไม่สำเร็จ HTTP '+r.status);
-    el.className='ok'; el.textContent='✓ เข้ารหัสและบันทึกขึ้น DB เรียบร้อยแล้ว!';
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    el.className='ok'; el.textContent='✓ เข้ารหัสและบันทึกขึ้น DB สำเร็จ!';
   } catch(e) {
     el.className='err'; el.textContent='✗ บันทึกไม่สำเร็จ: '+e.message;
   }
 }
 
-async function loadAndDecryptFromDB() {
-  const pin = document.getElementById('masterPin').value.trim();
-  const el = document.getElementById('statusMsg');
-  const supaUrl = document.getElementById('supaUrl').value.trim();
-  const supaKey = document.getElementById('supaKey').value.trim();
-  if(!pin){ el.className='err'; el.textContent='กรุณาใส่รหัสผ่านกลุ่มเพื่อถอดรหัส'; el.style.display='block'; return; }
-  if(!supaUrl || !supaKey){ el.className='err'; el.textContent='กรุณาใส่ Supabase URL และ Key ก่อน'; el.style.display='block'; return; }
+// ผู้ทดลองกรอก Passcode หน้าแรก เพื่อโหลดอัตโนมัติ
+async function unlockApp() {
+  const pin = document.getElementById('gatePin').value.trim();
+  const errEl = document.getElementById('gateError');
+  if(!pin){ errEl.style.display='block'; return; }
 
-  el.className='ok'; el.textContent='กำลังดึงข้อมูลจาก DB...'; el.style.display='block';
+  errEl.style.display='none';
   try {
-    const r = await fetch(`${supaUrl}/rest/v1/shared_configs?id=eq.main_config`, {
-      headers: { 'apikey': supaKey, 'Authorization': 'Bearer '+supaKey }
+    const r = await fetch(`${DEFAULT_SUPA_URL}/rest/v1/shared_configs?id=eq.main_config`, {
+      headers: { 'apikey': DEFAULT_SUPA_KEY, 'Authorization': 'Bearer '+DEFAULT_SUPA_KEY }
     });
     const rows = await r.json();
-    if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูลการตั้งค่าใน DB');
+    if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูล');
 
     const decrypted = await decryptData(rows[0].encrypted_data, pin);
-    if(!decrypted) throw new Error('รหัสผ่านไม่ถูกต้อง หรือข้อมูลเสียหาย');
+    if(!decrypted) throw new Error('รหัสผ่านไม่ถูกต้อง');
 
     cfg.openAiKey = decrypted.openAiKey || '';
     cfg.geminiKey = decrypted.geminiKey || '';
-    document.getElementById('openAiKey').value = cfg.openAiKey;
-    document.getElementById('geminiKey').value = cfg.geminiKey;
+    cfg.supaUrl = DEFAULT_SUPA_URL;
+    cfg.supaKey = DEFAULT_SUPA_KEY;
     saveSettings();
 
-    el.className='ok'; el.textContent='✓ โหลดและถอดรหัส API Keys สำเร็จพร้อมใช้งาน!';
+    show('home');
   } catch(e) {
-    el.className='err'; el.textContent='✗ โหลดไม่สำเร็จ: '+e.message;
+    errEl.textContent='รหัสผ่านไม่ถูกต้อง หรือเชื่อมต่อไม่ได้';
+    errEl.style.display='block';
   }
 }
 
@@ -361,7 +387,7 @@ async function testApiKey(type){
   }catch(e){el.className='err';el.textContent='✗ เชื่อมต่อไม่ได้';}
 }
 
-/* ===== แชทและโทรเหมือนเดิม ===== */
+// --- โค้ดแชทและโทรเหมือนเดิม ---
 let chatHistory=[];
 function resetChat(){
   chatHistory=[{role:'assistant',content:`สวัสดีจ้า 🌸 ${PERSONAS[cfg.tone].name} เอง มีอะไรคุยกับเค้าได้เสมอนะ`}];
