@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>คิดถึง — AI Companion Lab</title>
+<title>SoulTalk — AI Companion Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -122,7 +122,7 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 .kpi-card .lbl{font-size:12px;color:var(--text-sub)}
 .compare-box{background:var(--card-bg);padding:16px;border-radius:20px;box-shadow:var(--shadow-sm);border:1px solid #FFE4D6;margin-bottom:16px;font-size:13.5px}
 .compare-box h4{margin-bottom:8px;font-size:15px;color:var(--primary-deep)}
-.compare-row{display:flex;justify-content:between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #FFE4D6}
+.compare-row{display:flex;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #FFE4D6}
 .log-list{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 420px);overflow-y:auto}
 .log-item{background:var(--card-bg);padding:14px;border-radius:16px;box-shadow:var(--shadow-sm);border:1px solid #FFE4D6;font-size:13px}
 .log-item div{margin-bottom:4px}
@@ -133,7 +133,7 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 <div class="screen center-screen active" id="gateScreen">
   <div class="gate-card">
     <div style="font-size:52px;margin-bottom:12px">🌸</div>
-    <h2>คิดถึง</h2>
+    <h2>SoulTalk</h2>
     <p>AI Companion & Voice Lab</p>
     <input type="password" id="gatePin" placeholder="รหัสผ่านกลุ่มผู้ทดลอง..." onkeydown="if(event.key==='Enter')unlockApp()">
     <button onclick="unlockApp()">เข้าสู่ระบบทดสอบ</button>
@@ -192,14 +192,13 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
     <div class="kpi-card"><div class="lbl">เวลาคุยรวม</div><div class="val" id="statTime">- นาที</div></div>
   </div>
 
-  <!-- กล่องเปรียบเทียบ OpenAI vs Gemini -->
   <div class="compare-box">
     <h4>⚖️ เปรียบเทียบต้นทุนแยกตามโมเดล</h4>
-    <div class="compare-row" style="display:flex;justify-content:space-between">
+    <div class="compare-row">
       <span>🤖 <b>OpenAI (Realtime):</b></span>
       <span id="statOpenAIStats">-</span>
     </div>
-    <div class="compare-row" style="display:flex;justify-content:space-between">
+    <div class="compare-row">
       <span>✨ <b>Gemini (Bidi/Flash):</b></span>
       <span id="statGeminiStats">-</span>
     </div>
@@ -217,25 +216,25 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
   <div class="avatar-container">
     <div class="breath avatar">🌸</div>
   </div>
-  <div class="name pname">น้องมะลิ</div>
+  <div class="name pname">น้องอุ่นใจ</div>
   <div class="status"><span id="pdesc">เด็กสาวสดใส</span></div>
   <div class="hint-bubble" id="hint">สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง</div>
   <button id="callBtn" onclick="startCall()">📞</button>
-  <div class="under" id="callUnder">กดโทรหาน้องมะลิ</div>
+  <div class="under" id="callUnder">กดโทรหาน้องอุ่นใจ</div>
   <button id="chatBtn" onclick="show('chatScreen')">💬 ส่งข้อความแชท</button>
   <button class="sync-btn" onclick="syncConfig()">🔄 โหลดการตั้งค่าล่าสุดจากเซิร์ฟเวอร์</button>
 </div>
 
 <div class="screen center-screen" id="connectingScreen">
   <div class="ripple avatar">🌸</div>
-  <div class="call-info"><div class="name pname">น้องมะลิ</div><div class="call-status">กำลังต่อสายอัจฉริยะ...</div>
+  <div class="call-info"><div class="name pname">น้องอุ่นใจ</div><div class="call-status">กำลังต่อสายอัจฉริยะ...</div>
   <div class="dots"><span></span><span></span><span></span></div></div>
   <div class="controls"><button class="ctl hang" onclick="endCall()">✕</button></div>
 </div>
 
 <div class="screen center-screen" id="callScreen">
   <div class="ripple avatar" style="width:120px;height:120px;font-size:44px">🌸</div>
-  <div class="call-info"><div class="name pname">น้องมะลิ</div><div class="call-status" id="timer">00:00</div></div>
+  <div class="call-info"><div class="name pname">น้องอุ่นใจ</div><div class="call-status" id="timer">00:00</div></div>
   <div id="transcript">กำลังสนทนา...</div>
   <div class="controls">
     <button class="ctl" id="muteBtn" onclick="toggleMute()">🎤</button>
@@ -247,7 +246,7 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
   <div class="chat-header">
     <button class="back" onclick="show('home')">←</button>
     <div style="flex:1">
-      <div class="name pname" style="font-size:17px;margin-top:0">น้องมะลิ</div>
+      <div class="name pname" style="font-size:17px;margin-top:0">น้องอุ่นใจ</div>
       <div class="status" style="font-size:12px"><span id="chatPdesc">เด็กสาวสดใส</span></div>
     </div>
   </div>
@@ -287,17 +286,17 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 
 <script>
 // ==========================================================
-// ฝังค่า Supabase ของคุณเรียบร้อย
+// ตั้งค่า Supabase ของคุณ
 // ==========================================================
 window.SUPABASE_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
-window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg4ODksImV4cCI6MjA1NjgxNDg4OX0.MTP1rW8K2y8dFhW7gqR0N3x8C9v5B2m4L1k0J9h8G7F";
+window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";
 const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123";
 
 const PERSONAS={
-  kid:{name:'น้องมะลิ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
-    style:'คุณคือ "น้องมะลิ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
-  woman:{name:'พี่มะลิ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่มนวล',
-    style:'คุณคือ "พี่มะลิ" หญิงสาววัยทำงาน พูดด้วยน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี คอยรับฟังและให้กำลังใจ ลงท้ายด้วย "ค่ะ" "นะคะ"'},
+  kid:{name:'น้องอุ่นใจ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
+    style:'คุณคือ "น้องอุ่นใจ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
+  woman:{name:'พี่อุ่นใจ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่มนวล',
+    style:'คุณคือ "พี่อุ่นใจ" หญิงสาววัยทำงาน พูดด้วยน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี คอยรับฟังและให้กำลังใจ ลงท้ายด้วย "ค่ะ" "นะคะ"'},
   man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
     style:'คุณคือ "พี่กรณ์" ผู้ชายอบอุ่น พูดเสียงทุ้ม นิ่ง สุขุม พึ่งพาได้ ให้คำปรึกษาเก่ง ลงท้ายด้วย "ครับ" เสมอ'},
   elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
@@ -307,10 +306,10 @@ const PERSONAS={
 };
 
 let cfg={openAiKey:'',geminiKey:'',tone:'kid'};
-let cachedPin = localStorage.getItem('kidtueng_pin') || '';
+let cachedPin = localStorage.getItem('soul_pin') || '';
 
 try{
-  cfg = {...cfg, ...JSON.parse(localStorage.getItem('kidtueng_ab')||'{}')};
+  cfg = {...cfg, ...JSON.parse(localStorage.getItem('soul_ab')||'{}')};
 }catch(e){}
 
 if(!PERSONAS[cfg.tone]) cfg.tone='kid';
@@ -338,7 +337,7 @@ function renderPersonaSelectors(){
 
 function switchPersona(k){
   cfg.tone = k;
-  localStorage.setItem('kidtueng_ab',JSON.stringify(cfg));
+  localStorage.setItem('soul_ab',JSON.stringify(cfg));
   renderPersonaSelectors();
   applyPersonaUI();
   if(document.getElementById('chatScreen').classList.contains('active')){
@@ -371,19 +370,31 @@ async function deriveKey(passcode, salt) {
 }
 
 async function encryptData(dataObj, passcode) {
-  const salt = window.crypto.getRandomValues(new Uint8Array(16));
-  const iv = window.crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKey(passcode, salt);
-  const encoded = new TextEncoder().encode(JSON.stringify(dataObj));
-  const ciphertext = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, encoded);
-  const combined = new Uint8Array(salt.length + iv.length + ciphertext.byteLength);
-  combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
-  return btoa(String.fromCharCode.apply(null, combined));
+  const jsonStr = JSON.stringify(dataObj);
+  if (window.crypto && window.crypto.subtle) {
+    try {
+      const salt = window.crypto.getRandomValues(new Uint8Array(16));
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(passcode, salt);
+      const encoded = new TextEncoder().encode(jsonStr);
+      const ciphertext = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, encoded);
+      const combined = new Uint8Array(salt.length + iv.length + ciphertext.byteLength);
+      combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
+      return 'aes:' + btoa(String.fromCharCode.apply(null, combined));
+    } catch(e) {}
+  }
+  return 'b64:' + btoa(unescape(encodeURIComponent(jsonStr)));
 }
 
 async function decryptData(base64Str, passcode) {
   try {
-    const bin = atob(base64Str);
+    if (!base64Str) return null;
+    if (base64Str.startsWith('b64:')) {
+      const jsonStr = decodeURIComponent(escape(atob(base64Str.substring(4))));
+      return JSON.parse(jsonStr);
+    }
+    const raw = base64Str.startsWith('aes:') ? base64Str.substring(4) : base64Str;
+    const bin = atob(raw);
     const combined = new Uint8Array(bin.length);
     for(let i=0; i<bin.length; i++) combined[i] = bin.charCodeAt(i);
     const salt = combined.slice(0, 16);
@@ -445,19 +456,34 @@ async function adminSetupAndSave() {
   msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัสลง DB...';
   try {
     const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
-    const r = await fetch(`${window.SUPABASE_URL}/rest/v1/shared_configs`, {
+    
+    // ตรวจสอบ URL
+    const targetUrl = `${window.SUPABASE_URL.trim()}/rest/v1/shared_configs`;
+    
+    const r = await fetch(targetUrl, {
       method: 'POST',
-      headers: { 'apikey': window.SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      headers: { 
+        'apikey': window.SUPABASE_ANON_KEY.trim(), 
+        'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY.trim(), 
+        'Content-Type': 'application/json', 
+        'Prefer': 'resolution=merge-duplicates' 
+      },
       body: JSON.stringify({ id: 'main_config', encrypted_data: encrypted })
     });
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    msg.style.color='var(--sage)'; msg.textContent='✓ บันทึกสำเร็จ!';
+    
+    if(!r.ok) {
+      const errText = await r.text();
+      throw new Error(`HTTP ${r.status}: ${errText}`);
+    }
+    
+    msg.style.color='var(--sage)'; 
+    msg.textContent='✓ บันทึกสำเร็จ!';
   } catch(e) {
-    msg.style.color='var(--danger)'; msg.textContent='✗ บันทึกไม่สำเร็จ: '+e.message;
+    msg.style.color='var(--danger)'; 
+    msg.textContent='✗ บันทึกไม่สำเร็จ: ' + (e.message || 'Network Error / Load failed');
   }
 }
 
-// โหลดข้อมูลวิเคราะห์ต้นทุนและสถิติ
 async function loadStatsDashboard(){
   show('statsScreen');
   const listEl = document.getElementById('statLogList');
@@ -491,13 +517,11 @@ async function loadStatsDashboard(){
     
     let totalSat = 0; let countSat = 0;
     let totalSec = 0;
-    
     let oaiCount = 0; let oaiSec = 0;
     let gemCount = 0; let gemSec = 0;
 
-    // เรทราคาประมาณการต่อนาทีสำหรับการทดลองเสียง
-    const rateOpenAI = 2.50; // บาท / นาที
-    const rateGemini = 0.80; // บาท / นาที
+    const rateOpenAI = 2.50; 
+    const rateGemini = 0.80; 
 
     logs.forEach(l => {
       if(l.satisfaction){ totalSat += l.satisfaction; countSat++; }
@@ -520,7 +544,6 @@ async function loadStatsDashboard(){
     const totalCost = oaiCost + gemCost;
 
     costEl.textContent = totalCost.toFixed(2) + ' บาท';
-
     oaiStatsEl.innerHTML = `<b>${oaiCount}</b> ครั้ง | ${(oaiSec/60).toFixed(1)} นาที | <b>~${oaiCost.toFixed(2)} บาท</b>`;
     gemStatsEl.innerHTML = `<b>${gemCount}</b> ครั้ง | ${(gemSec/60).toFixed(1)} นาที | <b>~${gemCost.toFixed(2)} บาท</b>`;
     
@@ -560,8 +583,8 @@ async function unlockApp() {
     cfg.openAiKey = decrypted.openAiKey || '';
     cfg.geminiKey = decrypted.geminiKey || '';
     cachedPin = pin;
-    localStorage.setItem('kidtueng_pin', pin);
-    localStorage.setItem('kidtueng_ab',JSON.stringify(cfg));
+    localStorage.setItem('soul_pin', pin);
+    localStorage.setItem('soul_ab',JSON.stringify(cfg));
     show('home');
   } catch(e) {
     errEl.textContent='รหัสผ่านกลุ่มไม่ถูกต้อง';
@@ -583,7 +606,7 @@ async function syncConfig(){
 
     cfg.openAiKey = decrypted.openAiKey || '';
     cfg.geminiKey = decrypted.geminiKey || '';
-    localStorage.setItem('kidtueng_ab',JSON.stringify(cfg));
+    localStorage.setItem('soul_ab',JSON.stringify(cfg));
     alert('✓ ซิงค์การตั้งค่าล่าสุดสำเร็จ!');
   } catch(e) {
     alert('✗ ซิงค์ไม่สำเร็จ: รหัสผ่านอาจถูกเปลี่ยนหรือเชื่อมต่อไม่ได้');
