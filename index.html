@@ -293,9 +293,6 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 </div>
 
 <script>
-// ==========================================================
-// ตั้งค่าระบบ (รองรับการตั้งค่าผ่าน Admin Panel / LocalStorage)
-// ==========================================================
 const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123";
 
 let cfg = {
@@ -312,20 +309,18 @@ try{
   cfg = {...cfg, ...JSON.parse(localStorage.getItem('soul_ab')||'{}')};
 }catch(e){}
 
-if(!PERSONAS) {
-  var PERSONAS={
-    kid:{name:'น้องอุ่นใจ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
-      style:'คุณคือ "น้องอุ่นใจ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
-    woman:{name:'พี่อุ่นใจ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่มนวล',
-      style:'You are "พี่อุ่นใจ" หญิงสาววัยทำงาน พูดด้วยน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี คอยรับฟังและให้กำลังใจ ลงท้ายด้วย "ค่ะ" "นะคะ"'},
-    man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
-      style:'คุณคือ "พี่กรณ์" ผู้ชายอบอุ่น พูดเสียงทุ้ม นิ่ง สุขุม พึ่งพาได้ ให้คำปรึกษาเก่ง ลงท้ายด้วย "ครับ" เสมอ'},
-    elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
-      style:'คุณคือ "ลุงชัย" ชายสูงวัยใจดี พูดช้า ใจเย็น สุขุม ชอบเล่าเรื่องราวดีๆ ให้แง่คิด เรียกผู้ใช้ว่า "หลาน" ลงท้ายด้วย "ครับ"'},
-    neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',desc:'เพื่อนคู่คิด กลางๆ',
-      style:'คุณคือ "ฟ้า" เพื่อนสนิทที่เป็นกลาง รับฟังเก่ง เป็นกันเอง ไม่ระบุเพศ ใช้คำพูดสุภาพเป็นกันเอง ลงท้ายด้วย "นะ"'}
-  };
-}
+const PERSONAS={
+  kid:{name:'น้องอุ่นใจ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
+    style:'คุณคือ "น้องอุ่นใจ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
+  woman:{name:'พี่อุ่นใจ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่มนวล',
+    style:'คุณคือ "พี่อุ่นใจ" หญิงสาววัยทำงาน พูดด้วยน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี คอยรับฟังและให้กำลังใจ ลงท้ายด้วย "ค่ะ" "นะคะ"'},
+  man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
+    style:'คุณคือ "พี่กรณ์" ผู้ชายอบอุ่น พูดเสียงทุ้ม นิ่ง สุขุม พึ่งพาได้ ให้คำปรึกษาเก่ง ลงท้ายด้วย "ครับ" เสมอ'},
+  elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
+    style:'คุณคือ "ลุงชัย" ชายสูงวัยใจดี พูดช้า ใจเย็น สุขุม ชอบเล่าเรื่องราวดีๆ ให้แง่คิด เรียกผู้ใช้ว่า "หลาน" ลงท้ายด้วย "ครับ"'},
+  neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',desc:'เพื่อนคู่คิด กลางๆ',
+    style:'คุณคือ "ฟ้า" เพื่อนสนิทที่เป็นกลาง รับฟังเก่ง เป็นกันเอง ไม่ระบุเพศ ใช้คำพูดสุภาพเป็นกันเอง ลงท้ายด้วย "นะ"'}
+};
 
 if(!PERSONAS[cfg.tone]) cfg.tone='kid';
 if(cfg.openAiKey || cfg.geminiKey){ show('home'); }
@@ -428,7 +423,6 @@ function verifyAdmin(){
     errEl.style.display='none';
     document.getElementById('adminPasswordInput').value='';
     
-    // โหลดค่าปัจจุบันขึ้นมาแสดงที่หน้า Panel ทันที
     document.getElementById('setupSupabaseUrl').value = cfg.supabaseUrl || '';
     document.getElementById('setupSupabaseKey').value = cfg.supabaseAnonKey || '';
     document.getElementById('setupOpenAI').value = cfg.openAiKey || '';
@@ -481,7 +475,6 @@ async function adminSetupAndSave() {
     return; 
   }
 
-  // อัปเดตค่า configuration ในระบบทันที
   cfg.supabaseUrl = sbUrl;
   cfg.supabaseAnonKey = sbKey;
   cfg.openAiKey = openAi;
@@ -866,13 +859,18 @@ function endCall(){
   try{ if(audioCtx) audioCtx.close(); }catch(e){}
   try{dc&&dc.close()}catch(e){} try{pc&&pc.close()}catch(e){}
   try{mediaStream&&mediaStream.getTracks().forEach(t=>t.stop())}catch(e){}
-  pc=dc=mediaStream=geminiWs=audioCtx=null; document.getElementById('feedbackModal').style.display='flex';
+  pc=dc=mediaStream=geminiWs=audioCtx=null;
+  
+  // เพิ่มคำสั่งให้เด้งกลับหน้าหลักทันทีเมื่อกดวางสาย
+  document.getElementById('feedbackModal').style.display='flex';
 }
 
 async function submitFeedback(){
   const comment=document.getElementById('feedbackComment').value.trim();
   const duration=Math.floor((Date.now()-currentSession.startTime)/1000);
-  document.getElementById('feedbackModal').style.display='none'; show('home');
+  document.getElementById('feedbackModal').style.display='none'; 
+  show('home'); // กลับหน้าหลักอย่างสมบูรณ์
+  
   if(cfg.supabaseUrl && cfg.supabaseAnonKey){
     try{
       await fetch(`${cfg.supabaseUrl}/rest/v1/ai_experiment_logs`,{
