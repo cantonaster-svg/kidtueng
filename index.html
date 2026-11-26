@@ -37,11 +37,14 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 
 #home{align-items:center;justify-content:flex-start;padding:24px 20px}
 
-/* Persona Selector Carousel */
 .persona-selector{display:flex;gap:10px;overflow-x:auto;width:100%;max-width:400px;padding:8px 4px;margin-bottom:16px;scrollbar-width:none}
 .persona-selector::-webkit-scrollbar{display:none}
 .p-chip{flex:0 0 auto;background:var(--card-bg);border:1.5px solid #FFD4C4;border-radius:99px;padding:8px 16px;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-sm);transition:all .3s}
 .p-chip.active{border-color:var(--primary);background:linear-gradient(135deg, #FFE3D1, #FFD4C4);font-weight:500;box-shadow:0 4px 12px var(--accent-glow);transform:translateY(-2px)}
+
+.prov-row{display:flex;gap:8px;margin-top:14px;align-items:center;font-size:12.5px;color:var(--text-sub)}
+.prov{padding:6px 14px;border-radius:99px;border:1.5px solid #FFD4C4;background:#fff;font-family:'Mitr';font-size:12.5px;cursor:pointer;color:var(--text-main)}
+.prov.active{border-color:var(--primary);background:#FFE3D1;color:var(--primary-deep);font-weight:500}
 
 .avatar-container{position:relative;margin:10px 0 16px}
 .breath,.ripple{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE8D6,#FFB088);
@@ -81,7 +84,6 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 .ctl.muted{background:var(--text-sub);color:#fff}
 .hang{width:74px;height:74px;background:var(--danger);color:#fff;font-size:26px;box-shadow:0 8px 24px rgba(255,107,107,0.4)}
 
-/* Chat Screen */
 #chatScreen{background:#FFF8F3}
 .chat-header{padding:14px 20px;background:var(--card-bg);backdrop-filter:blur(10px);display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);border-bottom:1px solid #FFE4D6}
 .back{width:38px;height:38px;border-radius:50%;border:none;background:#FFE8D6;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s}
@@ -95,7 +97,6 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 .chat-input input:focus{border-color:var(--primary)}
 .sendBtn{width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(135deg, #FF7E5F, #E85D3B);color:#fff;font-size:18px;cursor:pointer;box-shadow:0 4px 12px var(--accent-glow)}
 
-/* Feedback Modal */
 #feedbackModal{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
 .modal-card{background:var(--card-bg);width:100%;max-width:390px;border-radius:28px;padding:28px;box-shadow:var(--shadow-lux);border:1px solid rgba(255,255,255,0.8)}
 .modal-card h3{margin-bottom:18px;font-size:20px;text-align:center;font-weight:600}
@@ -112,7 +113,6 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 .testBtn{background:#fff;color:var(--primary);border:1.5px solid var(--primary);font-size:13.5px;padding:10px;margin-bottom:12px;border-radius:99px;cursor:pointer;width:100%;font-weight:500;transition:all .2s}
 .testBtn:hover{background:#FFF3EE}
 
-/* Stats Dashboard Screen */
 #statsScreen{padding:20px;background:#FFF8F3}
 .stats-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .stats-header h2{font-size:20px;font-weight:600}
@@ -157,7 +157,7 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
   <div class="gate-card" style="max-width:380px;text-align:left">
     <h2 style="text-align:center">🛠️ Admin Panel</h2>
     <p style="text-align:center;margin-bottom:16px">จัดการ Supabase และ API Keys</p>
-    
+
     <div style="margin-bottom:12px">
       <label style="font-size:13px;font-weight:500">Supabase URL</label>
       <input type="text" id="setupSupabaseUrl" placeholder="https://..." style="margin-bottom:6px">
@@ -178,6 +178,7 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
       <label style="font-size:13px;font-weight:500">Gemini API Key</label>
       <input type="password" id="setupGemini" placeholder="AIza..." style="margin-bottom:6px">
       <button class="testBtn" onclick="testApiKey('gemini')">🔌 ทดสอบ Gemini Key</button>
+      <button class="testBtn" onclick="checkGeminiModels()">🔍 ตรวจโมเดล Gemini ที่คีย์นี้ใช้ได้</button>
     </div>
     <div style="margin-bottom:16px">
       <label style="font-size:13px;font-weight:500">รหัสผ่านกลุ่มผู้ทดลอง</label>
@@ -186,11 +187,10 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
     <button class="dbBtn" onclick="adminSetupAndSave()" style="margin-bottom:10px;width:100%;padding:14px;border-radius:99px;border:none;color:#fff;font-family:'Mitr';font-size:15px;cursor:pointer">⬆️ บันทึกและเข้ารหัสขึ้น DB</button>
     <button class="testBtn" onclick="loadStatsDashboard()" style="background:#FFE3D1;color:var(--primary);border:none;margin-top:4px">📊 วิเคราะห์ต้นทุนและสถิติ</button>
     <button class="link-btn" onclick="show('gateScreen')" style="display:block;width:100%;text-align:center">← กลับไปหน้าแรก</button>
-    <div id="setupMsg" style="font-size:13px;margin-top:12px;text-align:center"></div>
+    <div id="setupMsg" style="font-size:13px;margin-top:12px;text-align:center;white-space:pre-wrap"></div>
   </div>
 </div>
 
-<!-- หน้าแดชบอร์ดสถิติและต้นทุน -->
 <div class="screen" id="statsScreen">
   <div class="stats-header">
     <button class="back" onclick="show('setupScreen')">←</button>
@@ -230,6 +230,12 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
   </div>
   <div class="name pname">น้องอุ่นใจ</div>
   <div class="status"><span id="pdesc">เด็กสาวสดใส</span></div>
+  <div class="prov-row">
+    <span>ใช้ AI:</span>
+    <button class="prov" data-p="random" onclick="setProvider('random')">🎲 สุ่ม</button>
+    <button class="prov" data-p="openai" onclick="setProvider('openai')">OpenAI</button>
+    <button class="prov" data-p="gemini" onclick="setProvider('gemini')">Gemini</button>
+  </div>
   <div class="hint-bubble" id="hint">สวัสดีตอนเช้า ทานอาหารเช้าหรือยัง</div>
   <button id="callBtn" onclick="startCall()">📞</button>
   <div class="under" id="callUnder">กดโทรหาน้องอุ่นใจ</div>
@@ -240,7 +246,7 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 
 <div class="screen center-screen" id="connectingScreen">
   <div class="ripple avatar">🌸</div>
-  <div class="call-info"><div class="name pname">น้องอุ่นใจ</div><div class="call-status">กำลังต่อสายอัจฉริยะ...</div>
+  <div class="call-info"><div class="name pname">น้องอุ่นใจ</div><div class="call-status" id="connectStatus">กำลังต่อสายอัจฉริยะ...</div>
   <div class="dots"><span></span><span></span><span></span></div></div>
   <div class="controls"><button class="ctl hang" onclick="endCall()">✕</button></div>
 </div>
@@ -305,7 +311,8 @@ let cfg = {
   supabaseAnonKey: localStorage.getItem('soul_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg4ODksImV4cCI6MjA1NjgxNDg4OX0.MTP1rW8K2y8dFhW7gqR0N3x8C9v5B2m4L1k0J9h8G7F',
   openAiKey: '',
   geminiKey: '',
-  tone: 'kid'
+  tone: 'kid',
+  provider: 'random'
 };
 
 let cachedPin = localStorage.getItem('soul_pin') || '';
@@ -315,27 +322,44 @@ try{
 }catch(e){}
 
 const PERSONAS={
-  kid:{name:'น้องอุ่นใจ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
+  kid:{name:'น้องอุ่นใจ',emoji:'👧',voice:'coral',gVoice:'Leda',desc:'เด็กสาวสดใส',
     style:'คุณคือ "น้องอุ่นใจ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
-  woman:{name:'พี่อุ่นใจ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่มนวล',
+  woman:{name:'พี่อุ่นใจ',emoji:'👩',voice:'marin',gVoice:'Aoede',desc:'หญิงอบอุ่น นุ่มนวล',
     style:'คุณคือ "พี่อุ่นใจ" หญิงสาววัยทำงาน พูดด้วยน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี คอยรับฟังและให้กำลังใจ ลงท้ายด้วย "ค่ะ" "นะคะ"'},
-  man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
+  man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',gVoice:'Charon',desc:'ชายทุ้ม อบอุ่น',
     style:'คุณคือ "พี่กรณ์" ผู้ชายอบอุ่น พูดเสียงทุ้ม นิ่ง สุขุม พึ่งพาได้ ให้คำปรึกษาเก่ง ลงท้ายด้วย "ครับ" เสมอ'},
-  elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
+  elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',gVoice:'Orus',desc:'ผู้ใหญ่ใจดี',
     style:'คุณคือ "ลุงชัย" ชายสูงวัยใจดี พูดช้า ใจเย็น สุขุม ชอบเล่าเรื่องราวดีๆ ให้แง่คิด เรียกผู้ใช้ว่า "หลาน" ลงท้ายด้วย "ครับ"'},
-  neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',desc:'เพื่อนคู่คิด กลางๆ',
+  neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',gVoice:'Puck',desc:'เพื่อนคู่คิด กลางๆ',
     style:'คุณคือ "ฟ้า" เพื่อนสนิทที่เป็นกลาง รับฟังเก่ง เป็นกันเอง ไม่ระบุเพศ ใช้คำพูดสุภาพเป็นกันเอง ลงท้ายด้วย "นะ"'}
 };
 
 if(!PERSONAS[cfg.tone]) cfg.tone='kid';
+if(!['random','openai','gemini'].includes(cfg.provider)) cfg.provider='random';
 if(cfg.openAiKey || cfg.geminiKey){ show('home'); }
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const target = document.getElementById(id);
   if(target) target.classList.add('active');
-  if(id==='home') { renderPersonaSelectors(); updateHint(); applyPersonaUI(); }
-  if(id==='chatScreen') { renderPersonaSelectors(); resetChat(); applyPersonaUI(); }
+  if(id==='home') { renderPersonaSelectors(); updateHint(); applyPersonaUI(); renderProviders(); }
+  if(id==='chatScreen') { renderPersonaSelectors(); applyPersonaUI(); resetChat(); }
+}
+
+function saveCfg(){ localStorage.setItem('soul_ab',JSON.stringify(cfg)); }
+
+function setProvider(p){ cfg.provider=p; saveCfg(); renderProviders(); }
+function renderProviders(){
+  document.querySelectorAll('.prov').forEach(b=>b.classList.toggle('active', b.dataset.p===cfg.provider));
+}
+
+// เลือก provider ตามที่ตั้งไว้ (ถ้าไม่มีคีย์ของตัวที่เลือก จะแจ้ง)
+function pickProvider(){
+  const avail=[];
+  if(cfg.openAiKey) avail.push('openai');
+  if(cfg.geminiKey) avail.push('gemini');
+  if(cfg.provider==='random') return avail[Math.floor(Math.random()*avail.length)] || null;
+  return avail.includes(cfg.provider) ? cfg.provider : null;
 }
 
 function renderPersonaSelectors(){
@@ -352,7 +376,7 @@ function renderPersonaSelectors(){
 
 function switchPersona(k){
   cfg.tone = k;
-  localStorage.setItem('soul_ab',JSON.stringify(cfg));
+  saveCfg();
   renderPersonaSelectors();
   applyPersonaUI();
   if(document.getElementById('chatScreen').classList.contains('active')){
@@ -427,13 +451,11 @@ function verifyAdmin(){
   if(pwd === ADMIN_SECRET_PASSWORD){
     errEl.style.display='none';
     document.getElementById('adminPasswordInput').value='';
-    
     document.getElementById('setupSupabaseUrl').value = cfg.supabaseUrl || '';
     document.getElementById('setupSupabaseKey').value = cfg.supabaseAnonKey || '';
     document.getElementById('setupOpenAI').value = cfg.openAiKey || '';
     document.getElementById('setupGemini').value = cfg.geminiKey || '';
     document.getElementById('setupPin').value = cachedPin || '';
-    
     show('setupScreen');
   } else {
     errEl.style.display='block';
@@ -485,6 +507,92 @@ async function testSupabaseKey(){
   }
 }
 
+// ==========================================================
+// Gemini: ดึงรายชื่อโมเดลที่คีย์นี้ใช้ได้จริงจาก Google (ไม่ hardcode)
+// ==========================================================
+let geminiModelCache = null;
+let geminiCacheKey = '';
+let geminiWorkingChat = '';
+let geminiWorkingLive = '';
+
+async function getGeminiModels(key){
+  key = key || cfg.geminiKey;
+  if(geminiModelCache && geminiCacheKey===key) return geminiModelCache;
+  let all=[], pageToken='';
+  do{
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000&key=${key}${pageToken?'&pageToken='+pageToken:''}`);
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error?.message || ('HTTP '+r.status));
+    all = all.concat(d.models || []);
+    pageToken = d.nextPageToken || '';
+  } while(pageToken);
+
+  const ver = n => { const m=n.match(/(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; };
+  const name = m => m.name.replace('models/','');
+  const has = (m,method) => (m.supportedGenerationMethods||[]).includes(method);
+
+  const chatScore = n => (/flash/.test(n)?3:0) - (/lite/.test(n)?2:0) - (/preview|exp/.test(n)?5:0);
+  const chat = all.filter(m=>has(m,'generateContent')).map(name)
+    .filter(n=>n.startsWith('gemini') && !/(image|tts|embedding|audio|live|aqa|robotics|computer|vision)/.test(n))
+    .sort((a,b)=>(chatScore(b)-chatScore(a)) || (ver(b)-ver(a)));
+
+  const liveScore = n => (/native-audio/.test(n)?2:0) + (/live/.test(n)?1:0);
+  const live = all.filter(m=>has(m,'bidiGenerateContent')).map(name)
+    .sort((a,b)=>(liveScore(b)-liveScore(a)) || (ver(b)-ver(a)));
+
+  geminiModelCache = {chat, live};
+  geminiCacheKey = key;
+  return geminiModelCache;
+}
+
+async function checkGeminiModels(){
+  const msg = document.getElementById('setupMsg');
+  const k = document.getElementById('setupGemini').value.trim();
+  if(!k){ msg.style.color='var(--danger)'; msg.textContent='กรุณาใส่ Gemini Key ก่อน'; return; }
+  msg.style.color='var(--text-sub)'; msg.textContent='กำลังดึงรายชื่อโมเดล...';
+  try{
+    geminiModelCache=null;
+    const {chat, live} = await getGeminiModels(k);
+    msg.style.color='var(--text-main)';
+    msg.textContent =
+      `💬 โมเดลแชทที่ใช้ได้ (${chat.length}):\n${chat.slice(0,8).join('\n') || '- ไม่มี -'}\n\n` +
+      `📞 โมเดลโทรเสียง Live (${live.length}):\n${live.slice(0,8).join('\n') || '- ไม่มี (คีย์นี้โทรด้วย Gemini ไม่ได้) -'}`;
+  }catch(e){
+    msg.style.color='var(--danger)';
+    msg.textContent='✗ ดึงรายชื่อโมเดลไม่ได้: '+e.message;
+  }
+}
+
+async function geminiChat(contents, systemText, modelName){
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cfg.geminiKey}`,{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ system_instruction:{parts:[{text:systemText}]}, contents })
+  });
+  const data = await r.json();
+  if(!r.ok) throw new Error(data.error?.message || ('HTTP '+r.status));
+  const text = (data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+  if(!text) throw new Error('ไม่มีข้อความตอบกลับ ('+(data.candidates?.[0]?.finishReason||'unknown')+')');
+  return text;
+}
+
+async function geminiChatAuto(contents, systemText){
+  const {chat} = await getGeminiModels();
+  if(!chat.length) throw new Error('คีย์นี้ไม่มีโมเดลแชทที่ใช้ได้');
+  const list = geminiWorkingChat ? [geminiWorkingChat, ...chat.filter(m=>m!==geminiWorkingChat)] : chat;
+  const errs = [];
+  for(const m of list.slice(0,6)){
+    try{
+      const text = await geminiChat(contents, systemText, m);
+      geminiWorkingChat = m;
+      return {text, model:m};
+    }catch(e){
+      errs.push(`• ${m}: ${e.message}`);
+      if(/API key not valid|API_KEY_INVALID|PERMISSION_DENIED/i.test(e.message)) break;
+    }
+  }
+  throw new Error('ลองแล้วทุกโมเดล ไม่สำเร็จ\n'+errs.join('\n'));
+}
+
 async function adminSetupAndSave() {
   const sbUrl = document.getElementById('setupSupabaseUrl').value.trim();
   const sbKey = document.getElementById('setupSupabaseKey').value.trim();
@@ -492,16 +600,16 @@ async function adminSetupAndSave() {
   const gemini = document.getElementById('setupGemini').value.trim();
   const pin = document.getElementById('setupPin').value.trim();
   const msg = document.getElementById('setupMsg');
-  
+
   if(!sbUrl || !sbKey){
     msg.style.color='var(--danger)';
     msg.textContent='กรุณาใส่ Supabase URL และ Anon Key';
     return;
   }
-  if(!pin){ 
-    msg.style.color='var(--danger)'; 
-    msg.textContent='กรุณาใส่รหัสผ่านกลุ่ม (Passcode)'; 
-    return; 
+  if(!pin){
+    msg.style.color='var(--danger)';
+    msg.textContent='กรุณาใส่รหัสผ่านกลุ่ม (Passcode)';
+    return;
   }
 
   cfg.supabaseUrl = sbUrl;
@@ -509,37 +617,34 @@ async function adminSetupAndSave() {
   cfg.openAiKey = openAi;
   cfg.geminiKey = gemini;
   cachedPin = pin;
-  
+  geminiModelCache = null;
+
   localStorage.setItem('soul_sb_url', sbUrl);
   localStorage.setItem('soul_sb_key', sbKey);
   localStorage.setItem('soul_pin', pin);
-  localStorage.setItem('soul_ab', JSON.stringify(cfg));
+  saveCfg();
 
   msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัสขึ้น DB...';
   try {
     const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
-    const targetUrl = `${cfg.supabaseUrl.trim()}/rest/v1/shared_configs`;
-    
-    const r = await fetch(targetUrl, {
+    const r = await fetch(`${cfg.supabaseUrl}/rest/v1/shared_configs`, {
       method: 'POST',
-      headers: { 
-        'apikey': cfg.supabaseAnonKey.trim(), 
-        'Authorization': 'Bearer ' + cfg.supabaseAnonKey.trim(), 
+      headers: {
+        'apikey': cfg.supabaseAnonKey,
+        'Authorization': 'Bearer ' + cfg.supabaseAnonKey,
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates'
       },
       body: JSON.stringify({ id: 'main_config', encrypted_data: encrypted })
     });
-    
     if(!r.ok) {
       const errText = await r.text();
       throw new Error(`HTTP ${r.status}: ${errText}`);
     }
-    
-    msg.style.color='var(--sage)'; 
+    msg.style.color='var(--sage)';
     msg.textContent='✓ บันทึกสำเร็จ!';
   } catch(e) {
-    msg.style.color='var(--danger)'; 
+    msg.style.color='var(--danger)';
     msg.textContent='✗ บันทึกไม่สำเร็จ: ' + (e.message || 'Network Error');
   }
 }
@@ -553,15 +658,15 @@ async function loadStatsDashboard(){
   const timeEl = document.getElementById('statTime');
   const oaiStatsEl = document.getElementById('statOpenAIStats');
   const gemStatsEl = document.getElementById('statGeminiStats');
-  
+
   listEl.innerHTML = '<div style="text-align:center;color:var(--text-sub);padding:20px">กำลังคำนวณต้นทุนและสถิติ...</div>';
-  
+
   try {
     const r = await fetch(`${cfg.supabaseUrl}/rest/v1/ai_experiment_logs?order=created_at.desc&limit=100`, {
       headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': 'Bearer '+cfg.supabaseAnonKey }
     });
     const logs = await r.json();
-    
+
     if(!logs || logs.length === 0){
       totalEl.textContent = '0';
       satEl.textContent = '- / 5';
@@ -572,41 +677,28 @@ async function loadStatsDashboard(){
       listEl.innerHTML = '<div style="text-align:center;color:var(--text-sub);padding:20px">ยังไม่มีข้อมูลการทดลองใช้งาน</div>';
       return;
     }
-    
-    totalEl.textContent = logs.length;
-    
-    let totalSat = 0; let countSat = 0;
-    let totalSec = 0;
-    let oaiCount = 0; let oaiSec = 0;
-    let gemCount = 0; let gemSec = 0;
 
-    const rateOpenAI = 2.50; 
-    const rateGemini = 0.80; 
+    totalEl.textContent = logs.length;
+    let totalSat = 0, countSat = 0, totalSec = 0;
+    let oaiCount = 0, oaiSec = 0, gemCount = 0, gemSec = 0;
+    const rateOpenAI = 2.50, rateGemini = 0.80;
 
     logs.forEach(l => {
       if(l.satisfaction){ totalSat += l.satisfaction; countSat++; }
       const sec = l.duration_seconds || 0;
       totalSec += sec;
-      
-      if(l.model_tested === 'openai'){
-        oaiCount++; oaiSec += sec;
-      } else {
-        gemCount++; gemSec += sec;
-      }
+      if(l.model_tested === 'openai'){ oaiCount++; oaiSec += sec; }
+      else { gemCount++; gemSec += sec; }
     });
 
     satEl.textContent = countSat > 0 ? (totalSat / countSat).toFixed(1) + ' / 5' : '- / 5';
-    const totalMin = (totalSec / 60).toFixed(1);
-    timeEl.textContent = totalMin + ' นาที';
-
+    timeEl.textContent = (totalSec / 60).toFixed(1) + ' นาที';
     const oaiCost = (oaiSec / 60) * rateOpenAI;
     const gemCost = (gemSec / 60) * rateGemini;
-    const totalCost = oaiCost + gemCost;
-
-    costEl.textContent = totalCost.toFixed(2) + ' บาท';
+    costEl.textContent = (oaiCost + gemCost).toFixed(2) + ' บาท';
     oaiStatsEl.innerHTML = `<b>${oaiCount}</b> ครั้ง | ${(oaiSec/60).toFixed(1)} นาที | <b>~${oaiCost.toFixed(2)} บาท</b>`;
     gemStatsEl.innerHTML = `<b>${gemCount}</b> ครั้ง | ${(gemSec/60).toFixed(1)} นาที | <b>~${gemCost.toFixed(2)} บาท</b>`;
-    
+
     listEl.innerHTML = logs.map(l => `
       <div class="log-item">
         <div style="display:flex;justify-content:space-between;font-weight:500;color:var(--primary)">
@@ -618,7 +710,6 @@ async function loadStatsDashboard(){
         ${l.comment ? `<div style="color:var(--text-sub);margin-top:2px">💬 "${l.comment}"</div>` : ''}
       </div>
     `).join('');
-    
   } catch(e) {
     listEl.innerHTML = '<div style="text-align:center;color:var(--danger);padding:20px">โหลดสถิติไม่สำเร็จ กรุณาตรวจสอบตาราง ai_experiment_logs</div>';
   }
@@ -628,7 +719,6 @@ async function unlockApp() {
   const pin = document.getElementById('gatePin').value.trim();
   const errEl = document.getElementById('gateError');
   if(!pin){ errEl.style.display='block'; return; }
-
   errEl.style.display='none';
   try {
     const r = await fetch(`${cfg.supabaseUrl}/rest/v1/shared_configs?id=eq.main_config`, {
@@ -636,15 +726,14 @@ async function unlockApp() {
     });
     const rows = await r.json();
     if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูล');
-
     const decrypted = await decryptData(rows[0].encrypted_data, pin);
     if(!decrypted) throw new Error('รหัสผ่านไม่ถูกต้อง');
-
     cfg.openAiKey = decrypted.openAiKey || '';
     cfg.geminiKey = decrypted.geminiKey || '';
     cachedPin = pin;
+    geminiModelCache = null;
     localStorage.setItem('soul_pin', pin);
-    localStorage.setItem('soul_ab',JSON.stringify(cfg));
+    saveCfg();
     show('home');
   } catch(e) {
     errEl.textContent='รหัสผ่านกลุ่มไม่ถูกต้อง';
@@ -660,25 +749,39 @@ async function syncConfig(){
     });
     const rows = await r.json();
     if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูล');
-
     const decrypted = await decryptData(rows[0].encrypted_data, cachedPin);
     if(!decrypted) throw new Error('รหัสผ่านไม่ถูกต้อง');
-
     cfg.openAiKey = decrypted.openAiKey || '';
     cfg.geminiKey = decrypted.geminiKey || '';
-    localStorage.setItem('soul_ab',JSON.stringify(cfg));
+    geminiModelCache = null;
+    saveCfg();
     alert('✓ ซิงค์การตั้งค่าล่าสุดสำเร็จ!');
   } catch(e) {
     alert('✗ ซิงค์ไม่สำเร็จ: รหัสผ่านอาจถูกเปลี่ยนหรือเชื่อมต่อไม่ได้');
   }
 }
 
+// ==========================================================
+// แชท
+// ==========================================================
 let chatHistory=[];
+let chatProvider=null;
+
+function setChatStatus(extra){
+  const p = PERSONAS[cfg.tone];
+  const el = document.getElementById('chatPdesc');
+  const label = chatProvider==='gemini' ? 'Gemini' : chatProvider==='openai' ? 'OpenAI' : 'ไม่มีคีย์';
+  if(el) el.textContent = `${p.desc} · ${label}${extra?' ('+extra+')':''}`;
+}
+
 function resetChat(){
   const p = PERSONAS[cfg.tone];
+  chatProvider = pickProvider();
   chatHistory=[{role:'assistant',content:`สวัสดีจ้า 🌸 ${p.name} เอง มีอะไรคุยกับเค้าได้เสมอนะ`}];
+  setChatStatus(chatProvider==='gemini' && geminiWorkingChat ? geminiWorkingChat : '');
   renderChat();
 }
+
 function renderChat(){
   const b=document.getElementById('chatBody');
   if(!b) return;
@@ -686,27 +789,12 @@ function renderChat(){
   b.scrollTop=b.scrollHeight;
 }
 
-async function geminiChat(promptContents, systemText, modelName){
-  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cfg.geminiKey}`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      system_instruction: {parts: [{text: systemText}]},
-      contents: promptContents
-    })
-  });
-  const data=await r.json();
-  if(!r.ok || (data.error && data.error.code >= 429)){
-    throw new Error(data.error?.message || `HTTP ${r.status}`);
-  }
-  return data;
-}
-
 async function sendChat(){
   const inp=document.getElementById('chatText');const text=inp.value.trim();if(!text)return;
   inp.value='';chatHistory.push({role:'user',content:text});renderChat();
   const p=PERSONAS[cfg.tone];
 
-  if(cfg.openAiKey){
+  if(chatProvider==='openai'){
     try{
       const r=await fetch('https://api.openai.com/v1/chat/completions',{
         method:'POST',headers:{'Authorization':'Bearer '+cfg.openAiKey,'Content-Type':'application/json'},
@@ -715,49 +803,26 @@ async function sendChat(){
       const data=await r.json();
       chatHistory.push({role:'assistant',content:data.choices[0].message.content});
     }catch(e){chatHistory.push({role:'assistant',content:'(เชื่อมต่อ OpenAI ไม่ได้)'});}
-  } else if(cfg.geminiKey){
+  } else if(chatProvider==='gemini'){
     try{
-      let validHistory = [...chatHistory];
-      while(validHistory.length > 0 && validHistory[0].role === 'assistant') {
-        validHistory.shift();
-      }
-      const contents = validHistory.map(m=>({
-        role: m.role==='assistant' ? 'model' : 'user',
-        parts: [{text: m.content}]
-      }));
-
-      // ลำดับ: ใช้ 1.5-flash ก่อน เพราะ new users ยังเข้าถึงได้
-      const chatModels = ['gemini-1.5-flash','gemini-3.8-flash','gemini-2.5-flash'];
-      let lastErr = '';
-      let data = null;
-      let usedModel = '';
-      for(const mName of chatModels){
-        try{
-          data = await geminiChat(contents, p.style+' พูดไทย ตอบสั้น', mName);
-          usedModel = mName;
-          lastErr = '';
-          break;
-        }catch(err){
-          lastErr = err.message;
-          if(err.message.includes('high demand') || err.message.includes('429') || err.message.includes('not available')){
-            continue;
-          }
-          break;
-        }
-      }
-      if(!data) throw new Error(lastErr || 'Gemini ทุกโมเดลไม่พร้อมใช้งาน');
-      
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '(ไม่มีคำตอบจาก Gemini)';
-      chatHistory.push({role:'assistant',content: reply + (usedModel ? '' : '')});
+      const valid = chatHistory.slice(-20);
+      while(valid.length && valid[0].role==='assistant') valid.shift();
+      const contents = valid.map(m=>({role: m.role==='assistant'?'model':'user', parts:[{text:m.content}]}));
+      const {text:reply, model} = await geminiChatAuto(contents, p.style+' พูดไทย ตอบสั้น');
+      chatHistory.push({role:'assistant',content:reply});
+      setChatStatus(model);
     }catch(e){
       chatHistory.push({role:'assistant',content:`(Gemini Error: ${e.message})`});
     }
   } else {
-    chatHistory.push({role:'assistant',content:'(ยังไม่ได้กำหนด API Key ในระบบ)'});
+    chatHistory.push({role:'assistant',content:'(ไม่มี API Key ของ AI ที่เลือกไว้ ลองเปลี่ยนตัวเลือก "ใช้ AI" ที่หน้าหลัก)'});
   }
   renderChat();
 }
 
+// ==========================================================
+// ให้คะแนน
+// ==========================================================
 let currentSession={id:'',model:'',startTime:0,ratings:{nat:0,smooth:0,sat:0}};
 document.querySelectorAll('.stars').forEach(group=>{
   const key=group.dataset.key;
@@ -770,114 +835,171 @@ document.querySelectorAll('.stars').forEach(group=>{
   });
 });
 
-let pc,mediaStream,dc,timerInt,maxTimer,activeModel='', geminiWs=null, audioCtx=null;
+// ==========================================================
+// โทร
+// ==========================================================
+let pc,mediaStream,dc,timerInt,maxTimer,activeModel='';
+let geminiWs=null, micCtx=null, playCtx=null, micProcessor=null, micSource=null;
+let playHead=0, playSources=[], callActive=false, transcriptText='';
 
-async function connectGeminiCall(attemptModels, p, stream){
-  for(let i=0;i<attemptModels.length;i++){
-    const modelName = attemptModels[i];
-    const result = await new Promise((resolve, reject)=>{
-      let resolved = false;
-      const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
-      const ws = new WebSocket(wsUrl);
-      
-      ws.onopen=()=>{
-        const setupMsg = {
-          setup: {
-            model: "models/"+modelName,
-            generationConfig: { responseModalities: ["AUDIO"] },
-            systemInstruction: { parts: [{ text: p.style + ' พูดคุยโต้ตอบด้วยเสียงสั้นๆ เป็นธรรมชาติ' }] }
-          }
-        };
-        ws.send(JSON.stringify(setupMsg));
-      };
+async function parseWsMsg(ev){
+  let t = ev.data;
+  if(t instanceof Blob) t = await t.text();
+  return JSON.parse(t);
+}
 
-      ws.onmessage=async (event)=>{
-        try {
-          let msgText = event.data;
-          if(event.data instanceof Blob) {
-            msgText = await event.data.text();
-          }
-          const response = JSON.parse(msgText);
-          
-          if(response.setupComplete){
-            geminiWs = ws;
-            setupCallUI();
-            startGeminiAudioStreaming(stream, ws);
-            resolved = true;
-            resolve({success:true, model: modelName});
-            return;
-          }
-          
-          if(response.error){
-            ws.close();
-            if((response.error.code === 429 || response.error.message.includes('high demand') || response.error.message.includes('not available')) && i < attemptModels.length-1){
-              if(!resolved) { resolved = true; resolve({success:false, retry:true, error: response.error.message}); }
-            } else {
-              if(!resolved) { resolved = true; reject(new Error(response.error.message)); }
-            }
-            return;
-          }
-          
-          const parts = response.serverContent?.modelTurn?.parts;
-          if(parts) {
-            for(const part of parts) {
-              if(part.inlineData && part.inlineData.data) {
-                playBase64Audio(part.inlineData.data);
-              }
-              if(part.text) {
-                const tr = document.getElementById('transcript');
-                if(tr) tr.textContent = part.text;
-              }
-            }
-          }
-        } catch(e){}
-      };
+function tryGeminiLive(model, p){
+  return new Promise((resolve,reject)=>{
+    const ws = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${cfg.geminiKey}`);
+    let done=false;
+    const timer=setTimeout(()=>{
+      if(!done){ done=true; try{ws.close()}catch(e){} reject(new Error('หมดเวลารอ (10 วินาที)')); }
+    },10000);
 
-      ws.onerror=(e)=>{
-        ws.close();
-        if(i < attemptModels.length-1){
-          if(!resolved) { resolved = true; resolve({success:false, retry:true}); }
-        } else {
-          if(!resolved) { resolved = true; reject(new Error('Gemini เชื่อมต่อเสียงไม่ได้ทุกโมเดล')); }
+    ws.onopen=()=>{
+      ws.send(JSON.stringify({
+        setup:{
+          model:'models/'+model,
+          generationConfig:{
+            responseModalities:['AUDIO'],
+            speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:p.gVoice}}}
+          },
+          systemInstruction:{parts:[{text:p.style+' พูดภาษาไทย คุยโต้ตอบด้วยเสียงสั้นๆ เป็นธรรมชาติ'}]},
+          outputAudioTranscription:{}
         }
-      };
-      
-      ws.onclose=()=>{
-        if(!resolved && i < attemptModels.length-1){
-          resolved = true;
-          resolve({success:false, retry:true});
-        } else if(!resolved) {
-          resolved = true;
-          reject(new Error('Gemini ปิดการเชื่อมต่อก่อน setup สำเร็จ'));
-        }
-      };
-      
-      setTimeout(()=>{
-        if(!resolved){
-          resolved = true;
-          ws.close();
-          resolve({success:false, retry: i < attemptModels.length-1, error:'Timeout'});
-        }
-      }, 8000);
-    });
-    
-    if(result.success) return result;
+      }));
+    };
+
+    ws.onmessage=async ev=>{
+      let msg; try{ msg=await parseWsMsg(ev); }catch(e){ return; }
+      if(!done && msg.setupComplete){
+        done=true; clearTimeout(timer); resolve(ws); return;
+      }
+      if(done) handleGeminiMsg(msg);
+    };
+
+    ws.onclose=ev=>{
+      if(!done){
+        done=true; clearTimeout(timer);
+        reject(new Error(ev.reason || ('ปิดการเชื่อมต่อ code '+ev.code)));
+      } else if(callActive && geminiWs===ws){
+        alert('Gemini วางสาย: '+(ev.reason || ('code '+ev.code)));
+        endCall();
+      }
+    };
+  });
+}
+
+function handleGeminiMsg(msg){
+  const sc = msg.serverContent;
+  if(!sc) return;
+  if(sc.interrupted) stopPlayback();
+  (sc.modelTurn?.parts || []).forEach(part=>{
+    if(part.inlineData?.data) queuePcm(part.inlineData.data, part.inlineData.mimeType);
+  });
+  if(sc.outputTranscription?.text){
+    transcriptText += sc.outputTranscription.text;
+    const tr=document.getElementById('transcript');
+    if(tr) tr.textContent = transcriptText.slice(-200);
   }
-  throw new Error('Gemini Call ทุกโมเดลล้มเหลว');
+  if(sc.turnComplete) transcriptText='';
+}
+
+// Gemini ส่งเสียงกลับมาเป็น PCM 16-bit ดิบ ต้องแปลงเอง (decodeAudioData เล่นไม่ได้)
+function queuePcm(b64, mime){
+  if(!playCtx) return;
+  const rate = parseInt(((mime||'').match(/rate=(\d+)/)||[])[1] || '24000');
+  const bin = atob(b64);
+  const len = Math.floor(bin.length/2);
+  if(!len) return;
+  const buf = playCtx.createBuffer(1, len, rate);
+  const ch = buf.getChannelData(0);
+  for(let i=0;i<len;i++){
+    let v = bin.charCodeAt(i*2) | (bin.charCodeAt(i*2+1)<<8);
+    if(v>=32768) v-=65536;
+    ch[i] = v/32768;
+  }
+  const src = playCtx.createBufferSource();
+  src.buffer = buf;
+  src.connect(playCtx.destination);
+  const now = playCtx.currentTime;
+  if(playHead < now) playHead = now + 0.05;
+  src.start(playHead);
+  playHead += buf.duration;
+  playSources.push(src);
+  src.onended = ()=>{ playSources = playSources.filter(s=>s!==src); };
+}
+
+function stopPlayback(){
+  playSources.forEach(s=>{ try{s.stop()}catch(e){} });
+  playSources=[]; playHead=0;
+}
+
+function startGeminiMic(stream, ws){
+  micSource = micCtx.createMediaStreamSource(stream);
+  micProcessor = micCtx.createScriptProcessor(4096,1,1);
+  const mime = 'audio/pcm;rate='+micCtx.sampleRate;
+  micProcessor.onaudioprocess = e=>{
+    if(!ws || ws.readyState!==WebSocket.OPEN) return;
+    const input = e.inputBuffer.getChannelData(0);
+    const pcm = new Int16Array(input.length);
+    for(let i=0;i<input.length;i++){
+      const s = Math.max(-1, Math.min(1, input[i]));
+      pcm[i] = s<0 ? s*0x8000 : s*0x7FFF;
+    }
+    const bytes = new Uint8Array(pcm.buffer);
+    let bin='';
+    for(let i=0;i<bytes.length;i+=8192) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+8192));
+    ws.send(JSON.stringify({realtimeInput:{audio:{data:btoa(bin), mimeType:mime}}}));
+  };
+  micSource.connect(micProcessor);
+  micProcessor.connect(micCtx.destination);
+}
+
+async function startGeminiCall(p){
+  const {live} = await getGeminiModels();
+  if(!live.length) throw new Error('คีย์ Gemini นี้ไม่มีโมเดลโทรเสียง (Live API) ให้ใช้');
+  const list = geminiWorkingLive ? [geminiWorkingLive, ...live.filter(m=>m!==geminiWorkingLive)] : live;
+  const errs=[];
+  const cs=document.getElementById('connectStatus');
+  for(const m of list.slice(0,5)){
+    if(!mediaStream) throw new Error('ยกเลิกการโทร');
+    if(cs) cs.textContent='กำลังต่อสาย Gemini ('+m+')...';
+    try{
+      const ws = await tryGeminiLive(m, p);
+      geminiWs = ws;
+      geminiWorkingLive = m;
+      callActive = true;
+      startGeminiMic(mediaStream, ws);
+      setupCallUI();
+      const tr=document.getElementById('transcript');
+      if(tr) tr.textContent='เชื่อมต่อแล้ว ('+m+') ลองพูดได้เลย';
+      return;
+    }catch(e){
+      errs.push(`• ${m}: ${e.message}`);
+    }
+  }
+  throw new Error('ต่อ Gemini ไม่ได้ทุกโมเดล\n'+errs.join('\n'));
 }
 
 async function startCall(){
-  if(!cfg.openAiKey && !cfg.geminiKey){alert('กรุณาใส่ API Key ในระบบก่อน');return;}
-  let available=[];
-  if(cfg.openAiKey) available.push('openai');
-  if(cfg.geminiKey) available.push('gemini');
-  activeModel=available[Math.floor(Math.random()*available.length)];
+  activeModel = pickProvider();
+  if(!activeModel){ alert('ไม่มี API Key ของ AI ที่เลือกไว้'); return; }
   currentSession={id:'sess_'+Math.random().toString(36).substring(2,9),model:activeModel,startTime:Date.now(),ratings:{nat:0,smooth:0,sat:0}};
   show('connectingScreen');
-  
+  const cs=document.getElementById('connectStatus');
+  if(cs) cs.textContent='กำลังต่อสายอัจฉริยะ...';
+
+  // สร้าง AudioContext ทันทีตอนกดปุ่ม (iPhone ต้องสร้างใน user gesture)
+  if(activeModel==='gemini'){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    playCtx = new AC(); playCtx.resume();
+    micCtx = new AC(); micCtx.resume();
+  }
+
   try{
     try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
     } catch(micErr) {
       alert('ไม่สามารถเปิดใช้งานไมโครโฟนได้\n\nสาเหตุที่เป็นไปได้:\n1. ยังไม่อนุญาตให้ใช้ไมค์ในเบราว์เซอร์\n2. มือถือ/เบราว์เซอร์บังคับใช้ HTTPS สำหรับไมโครโฟน\n\nรายละเอียด: ' + micErr.message);
       endCall();
@@ -900,63 +1022,21 @@ async function startCall(){
       const ansr=await fetch('https://api.openai.com/v1/realtime/calls',{method:'POST',headers:{'Authorization':'Bearer '+ek,'Content-Type':'application/sdp'},body:offer.sdp});
       if(!ansr.ok)throw new Error('SDP Error');
       await pc.setRemoteDescription({type:'answer',sdp:await ansr.text()});
+      callActive=true;
       setupCallUI();
-    }else{
-      // ลำดับ: ใช้ 1.5-flash ก่อน เพราะ new users ยังเข้าถึงได้
-      const callModels = ['gemini-1.5-flash','gemini-3.8-flash','gemini-2.5-flash'];
-      await connectGeminiCall(callModels, p, mediaStream);
+    } else {
+      await startGeminiCall(p);
     }
-  }catch(err){alert('ต่อสายไม่สำเร็จ\n\n'+err.message);endCall();}
-}
-
-function startGeminiAudioStreaming(stream, ws) {
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)({sampleRate: 16000});
-    const source = audioCtx.createMediaStreamSource(stream);
-    const processor = audioCtx.createScriptProcessor(4096, 1, 1);
-    
-    processor.onaudioprocess = (e) => {
-      if(!ws || ws.readyState !== WebSocket.OPEN) return;
-      const inputData = e.inputBuffer.getChannelData(0);
-      const pcm16 = new Int16Array(inputData.length);
-      for (let i = 0; i < inputData.length; i++) {
-        pcm16[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF;
-      }
-      const base64Audio = btoa(String.fromCharCode.apply(null, new Uint8Array(pcm16.buffer)));
-      const audioMessage = {
-        realtimeInput: {
-          mediaChunks: [{ mimeType: "audio/pcm", data: base64Audio }]
-        }
-      };
-      ws.send(JSON.stringify(audioMessage));
-    };
-    
-    source.connect(processor);
-    processor.connect(audioCtx.destination);
-  } catch(e) {}
-}
-
-async function playBase64Audio(base64Data) {
-  try {
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)({sampleRate: 24000});
-    const binaryString = atob(base64Data);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    const audioBuffer = await audioCtx.decodeAudioData(bytes.buffer);
-    const source = audioCtx.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(audioCtx.destination);
-    source.start(0);
-  } catch(e) {}
+  }catch(err){
+    if(mediaStream){ alert('ต่อสายไม่สำเร็จ\n\n'+err.message); endCall(); }
+  }
 }
 
 function setupCallUI(){
-  show('callScreen'); 
+  show('callScreen');
+  transcriptText='';
   const tr = document.getElementById('transcript');
-  if(tr) tr.textContent='กำลังพูดคุย...';
+  if(tr && activeModel!=='gemini') tr.textContent='กำลังพูดคุย...';
   let callStart=Date.now();
   timerInt=setInterval(()=>{
     const s=Math.floor((Date.now()-callStart)/1000);
@@ -972,21 +1052,27 @@ function toggleMute(){
 }
 
 function endCall(){
+  callActive=false;
   clearInterval(timerInt);clearTimeout(maxTimer);
-  try{ if(geminiWs) geminiWs.close(); }catch(e){}
-  try{ if(audioCtx) audioCtx.close(); }catch(e){}
+  stopPlayback();
+  try{ if(micProcessor){ micProcessor.onaudioprocess=null; micProcessor.disconnect(); } }catch(e){}
+  try{ if(micSource) micSource.disconnect(); }catch(e){}
+  const ws=geminiWs; geminiWs=null;
+  try{ if(ws) ws.close(); }catch(e){}
+  try{ if(micCtx) micCtx.close(); }catch(e){}
+  try{ if(playCtx) playCtx.close(); }catch(e){}
   try{dc&&dc.close()}catch(e){} try{pc&&pc.close()}catch(e){}
   try{mediaStream&&mediaStream.getTracks().forEach(t=>t.stop())}catch(e){}
-  pc=dc=mediaStream=geminiWs=audioCtx=null;
+  pc=dc=mediaStream=micCtx=playCtx=micProcessor=micSource=null;
   document.getElementById('feedbackModal').style.display='flex';
 }
 
 async function submitFeedback(){
   const comment=document.getElementById('feedbackComment').value.trim();
   const duration=Math.floor((Date.now()-currentSession.startTime)/1000);
-  document.getElementById('feedbackModal').style.display='none'; 
+  document.getElementById('feedbackModal').style.display='none';
   show('home');
-  
+
   if(cfg.supabaseUrl && cfg.supabaseAnonKey){
     try{
       await fetch(`${cfg.supabaseUrl}/rest/v1/ai_experiment_logs`,{
