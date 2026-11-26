@@ -156,7 +156,15 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 <div class="screen center-screen" id="setupScreen">
   <div class="gate-card" style="max-width:380px;text-align:left">
     <h2 style="text-align:center">🛠️ Admin Panel</h2>
-    <p style="text-align:center;margin-bottom:16px">จัดการ API Keys และดูต้นทุน</p>
+    <p style="text-align:center;margin-bottom:16px">จัดการ Supabase และ API Keys</p>
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;font-weight:500">Supabase URL</label>
+      <input type="text" id="setupSupabaseUrl" placeholder="https://..." style="margin-bottom:6px">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;font-weight:500">Supabase Anon Key</label>
+      <input type="password" id="setupSupabaseKey" placeholder="eyJhbGci..." style="margin-bottom:6px">
+    </div>
     <div style="margin-bottom:12px">
       <label style="font-size:13px;font-weight:500">OpenAI API Key</label>
       <input type="password" id="setupOpenAI" placeholder="sk-..." style="margin-bottom:6px">
@@ -286,31 +294,38 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
 
 <script>
 // ==========================================================
-// ตั้งค่า Supabase ของคุณ
+// ตั้งค่าระบบ (รองรับการตั้งค่าผ่าน Admin Panel / LocalStorage)
 // ==========================================================
-window.SUPABASE_URL = "https://vsitajtgbmisfwynpevx.supabase.co";
-window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTcwNTUsImV4cCI6MjExMTEzMzA1NX0.fwKU8dJg9AWu4or-iFYvj8915x7W9zUDTx22g9JK7j4";
 const ADMIN_SECRET_PASSWORD = "my-super-admin-password-123";
 
-const PERSONAS={
-  kid:{name:'น้องอุ่นใจ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
-    style:'คุณคือ "น้องอุ่นใจ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
-  woman:{name:'พี่อุ่นใจ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่มนวล',
-    style:'คุณคือ "พี่อุ่นใจ" หญิงสาววัยทำงาน พูดด้วยน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี คอยรับฟังและให้กำลังใจ ลงท้ายด้วย "ค่ะ" "นะคะ"'},
-  man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
-    style:'คุณคือ "พี่กรณ์" ผู้ชายอบอุ่น พูดเสียงทุ้ม นิ่ง สุขุม พึ่งพาได้ ให้คำปรึกษาเก่ง ลงท้ายด้วย "ครับ" เสมอ'},
-  elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
-    style:'คุณคือ "ลุงชัย" ชายสูงวัยใจดี พูดช้า ใจเย็น สุขุม ชอบเล่าเรื่องราวดีๆ ให้แง่คิด เรียกผู้ใช้ว่า "หลาน" ลงท้ายด้วย "ครับ"'},
-  neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',desc:'เพื่อนคู่คิด กลางๆ',
-    style:'คุณคือ "ฟ้า" เพื่อนสนิทที่เป็นกลาง รับฟังเก่ง เป็นกันเอง ไม่ระบุเพศ ใช้คำพูดสุภาพเป็นกันเอง ลงท้ายด้วย "นะ"'}
+let cfg = {
+  supabaseUrl: localStorage.getItem('soul_sb_url') || 'https://vsitajtgbmisfwynpevx.supabase.co',
+  supabaseAnonKey: localStorage.getItem('soul_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzaXRhanRnYm1pc2Z3eW5wZXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg4ODksImV4cCI6MjA1NjgxNDg4OX0.MTP1rW8K2y8dFhW7gqR0N3x8C9v5B2m4L1k0J9h8G7F',
+  openAiKey: '',
+  geminiKey: '',
+  tone: 'kid'
 };
 
-let cfg={openAiKey:'',geminiKey:'',tone:'kid'};
 let cachedPin = localStorage.getItem('soul_pin') || '';
 
 try{
   cfg = {...cfg, ...JSON.parse(localStorage.getItem('soul_ab')||'{}')};
 }catch(e){}
+
+if(!PERSONAS) {
+  var PERSONAS={
+    kid:{name:'น้องอุ่นใจ',emoji:'👧',voice:'coral',desc:'เด็กสาวสดใส',
+      style:'คุณคือ "น้องอุ่นใจ" เด็กผู้หญิงอายุประมาณ 10 ขวบ พูดด้วยน้ำเสียงสูง ใส ร่าเริง ตื่นเต้นง่าย จังหวะเร็ว ใช้คำง่ายๆ แบบเด็ก ลงท้ายด้วย "ค่ะ" "นะคะ" "จ้า"'},
+    woman:{name:'พี่อุ่นใจ',emoji:'👩',voice:'marin',desc:'หญิงอบอุ่น นุ่มนวล',
+      style:'You are "พี่อุ่นใจ" หญิงสาววัยทำงาน พูดด้วยน้ำเสียงนุ่ม อบอุ่น อ่อนโยน เหมือนพี่สาวใจดี คอยรับฟังและให้กำลังใจ ลงท้ายด้วย "ค่ะ" "นะคะ"'},
+    man:{name:'พี่กรณ์',emoji:'👨',voice:'cedar',desc:'ชายทุ้ม อบอุ่น',
+      style:'คุณคือ "พี่กรณ์" ผู้ชายอบอุ่น พูดเสียงทุ้ม นิ่ง สุขุม พึ่งพาได้ ให้คำปรึกษาเก่ง ลงท้ายด้วย "ครับ" เสมอ'},
+    elder:{name:'ลุงชัย',emoji:'👴',voice:'ash',desc:'ผู้ใหญ่ใจดี',
+      style:'คุณคือ "ลุงชัย" ชายสูงวัยใจดี พูดช้า ใจเย็น สุขุม ชอบเล่าเรื่องราวดีๆ ให้แง่คิด เรียกผู้ใช้ว่า "หลาน" ลงท้ายด้วย "ครับ"'},
+    neutral:{name:'ฟ้า',emoji:'🙂',voice:'alloy',desc:'เพื่อนคู่คิด กลางๆ',
+      style:'คุณคือ "ฟ้า" เพื่อนสนิทที่เป็นกลาง รับฟังเก่ง เป็นกันเอง ไม่ระบุเพศ ใช้คำพูดสุภาพเป็นกันเอง ลงท้ายด้วย "นะ"'}
+  };
+}
 
 if(!PERSONAS[cfg.tone]) cfg.tone='kid';
 if(cfg.openAiKey || cfg.geminiKey){ show('home'); }
@@ -412,8 +427,14 @@ function verifyAdmin(){
   if(pwd === ADMIN_SECRET_PASSWORD){
     errEl.style.display='none';
     document.getElementById('adminPasswordInput').value='';
+    
+    // โหลดค่าปัจจุบันขึ้นมาแสดงที่หน้า Panel ทันที
+    document.getElementById('setupSupabaseUrl').value = cfg.supabaseUrl || '';
+    document.getElementById('setupSupabaseKey').value = cfg.supabaseAnonKey || '';
     document.getElementById('setupOpenAI').value = cfg.openAiKey || '';
     document.getElementById('setupGemini').value = cfg.geminiKey || '';
+    document.getElementById('setupPin').value = cachedPin || '';
+    
     show('setupScreen');
   } else {
     errEl.style.display='block';
@@ -442,29 +463,46 @@ async function testApiKey(type){
 }
 
 async function adminSetupAndSave() {
+  const sbUrl = document.getElementById('setupSupabaseUrl').value.trim();
+  const sbKey = document.getElementById('setupSupabaseKey').value.trim();
   const openAi = document.getElementById('setupOpenAI').value.trim();
   const gemini = document.getElementById('setupGemini').value.trim();
   const pin = document.getElementById('setupPin').value.trim();
   const msg = document.getElementById('setupMsg');
   
+  if(!sbUrl || !sbKey){
+    msg.style.color='var(--danger)';
+    msg.textContent='กรุณาใส่ Supabase URL และ Anon Key';
+    return;
+  }
   if(!pin){ 
     msg.style.color='var(--danger)'; 
     msg.textContent='กรุณาใส่รหัสผ่านกลุ่ม (Passcode)'; 
     return; 
   }
 
+  // อัปเดตค่า configuration ในระบบทันที
+  cfg.supabaseUrl = sbUrl;
+  cfg.supabaseAnonKey = sbKey;
+  cfg.openAiKey = openAi;
+  cfg.geminiKey = gemini;
+  cachedPin = pin;
+  
+  localStorage.setItem('soul_sb_url', sbUrl);
+  localStorage.setItem('soul_sb_key', sbKey);
+  localStorage.setItem('soul_pin', pin);
+  localStorage.setItem('soul_ab', JSON.stringify(cfg));
+
   msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัสลง DB...';
   try {
     const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
-    
-    // ตรวจสอบ URL
-    const targetUrl = `${window.SUPABASE_URL.trim()}/rest/v1/shared_configs`;
+    const targetUrl = `${cfg.supabaseUrl.trim()}/rest/v1/shared_configs`;
     
     const r = await fetch(targetUrl, {
       method: 'POST',
       headers: { 
-        'apikey': window.SUPABASE_ANON_KEY.trim(), 
-        'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY.trim(), 
+        'apikey': cfg.supabaseAnonKey.trim(), 
+        'Authorization': 'Bearer '+cfg.supabaseAnonKey.trim(), 
         'Content-Type': 'application/json', 
         'Prefer': 'resolution=merge-duplicates' 
       },
@@ -497,8 +535,8 @@ async function loadStatsDashboard(){
   listEl.innerHTML = '<div style="text-align:center;color:var(--text-sub);padding:20px">กำลังคำนวณต้นทุนและสถิติ...</div>';
   
   try {
-    const r = await fetch(`${window.SUPABASE_URL}/rest/v1/ai_experiment_logs?order=created_at.desc&limit=100`, {
-      headers: { 'apikey': window.SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY }
+    const r = await fetch(`${cfg.supabaseUrl}/rest/v1/ai_experiment_logs?order=created_at.desc&limit=100`, {
+      headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': 'Bearer '+cfg.supabaseAnonKey }
     });
     const logs = await r.json();
     
@@ -571,8 +609,8 @@ async function unlockApp() {
 
   errEl.style.display='none';
   try {
-    const r = await fetch(`${window.SUPABASE_URL}/rest/v1/shared_configs?id=eq.main_config`, {
-      headers: { 'apikey': window.SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY }
+    const r = await fetch(`${cfg.supabaseUrl}/rest/v1/shared_configs?id=eq.main_config`, {
+      headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': 'Bearer '+cfg.supabaseAnonKey }
     });
     const rows = await r.json();
     if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูล');
@@ -595,8 +633,8 @@ async function unlockApp() {
 async function syncConfig(){
   if(!cachedPin){ alert('ยังไม่มีบันทึกรหัสผ่านในเครื่อง กรุณาเข้าสู่ระบบใหม่อีกครั้ง'); return; }
   try {
-    const r = await fetch(`${window.SUPABASE_URL}/rest/v1/shared_configs?id=eq.main_config`, {
-      headers: { 'apikey': window.SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+window.SUPABASE_ANON_KEY }
+    const r = await fetch(`${cfg.supabaseUrl}/rest/v1/shared_configs?id=eq.main_config`, {
+      headers: { 'apikey': cfg.supabaseAnonKey, 'Authorization': 'Bearer '+cfg.supabaseAnonKey }
     });
     const rows = await r.json();
     if(!rows || rows.length === 0) throw new Error('ไม่พบข้อมูล');
@@ -642,10 +680,15 @@ async function sendChat(){
     }catch(e){chatHistory.push({role:'assistant',content:'(เชื่อมต่อ OpenAI ไม่ได้)'});}
   } else if(cfg.geminiKey){
     try{
-      const contents = chatHistory.map(m=>({
+      let validHistory = [...chatHistory];
+      while(validHistory.length > 0 && validHistory[0].role === 'assistant') {
+        validHistory.shift();
+      }
+      const contents = validHistory.map(m=>({
         role: m.role==='assistant' ? 'model' : 'user',
         parts: [{text: m.content}]
       }));
+
       const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+cfg.geminiKey,{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
@@ -675,7 +718,7 @@ document.querySelectorAll('.stars').forEach(group=>{
   });
 });
 
-let pc,mediaStream,dc,timerInt,maxTimer,activeModel='';
+let pc,mediaStream,dc,timerInt,maxTimer,activeModel='', geminiWs=null, audioCtx=null;
 async function startCall(){
   if(!cfg.openAiKey && !cfg.geminiKey){alert('กรุณาใส่ API Key ในระบบก่อน');return;}
   let available=[];
@@ -713,11 +756,90 @@ async function startCall(){
       setupCallUI();
     }else{
       const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
-      const ws=new WebSocket(wsUrl);
-      ws.onopen=()=>{ setupCallUI(); };
-      ws.onerror=()=>{alert('Gemini เชื่อมต่อไม่ได้');endCall();};
+      geminiWs=new WebSocket(wsUrl);
+      
+      geminiWs.onopen=()=>{
+        const setupMsg = {
+          setup: {
+            model: "models/gemini-2.0-flash-exp",
+            generationConfig: { responseModalities: ["AUDIO"] },
+            systemInstruction: { parts: [{ text: p.style + ' พูดคุยโต้ตอบด้วยเสียงสั้นๆ เป็นธรรมชาติ' }] }
+          }
+        };
+        geminiWs.send(JSON.stringify(setupMsg));
+        setupCallUI();
+        startGeminiAudioStreaming(mediaStream, geminiWs);
+      };
+
+      geminiWs.onmessage=async (event)=>{
+        try {
+          let msgText = event.data;
+          if(event.data instanceof Blob) {
+            msgText = await event.data.text();
+          }
+          const response = JSON.parse(msgText);
+          const parts = response.serverContent?.modelTurn?.parts;
+          if(parts) {
+            for(const part of parts) {
+              if(part.inlineData && part.inlineData.data) {
+                playBase64Audio(part.inlineData.data);
+              }
+              if(part.text) {
+                const tr = document.getElementById('transcript');
+                if(tr) tr.textContent = part.text;
+              }
+            }
+          }
+        } catch(e){}
+      };
+
+      geminiWs.onerror=()=>{alert('Gemini เชื่อมต่อเสียงไม่ได้');endCall();};
     }
   }catch(err){alert('ต่อสายไม่สำเร็จ\n\n'+err.message);endCall();}
+}
+
+function startGeminiAudioStreaming(stream, ws) {
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({sampleRate: 16000});
+    const source = audioCtx.createMediaStreamSource(stream);
+    const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+    
+    processor.onaudioprocess = (e) => {
+      if(!ws || ws.readyState !== WebSocket.OPEN) return;
+      const inputData = e.inputBuffer.getChannelData(0);
+      const pcm16 = new Int16Array(inputData.length);
+      for (let i = 0; i < inputData.length; i++) {
+        pcm16[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF;
+      }
+      const base64Audio = btoa(String.fromCharCode.apply(null, new Uint8Array(pcm16.buffer)));
+      const audioMessage = {
+        realtimeInput: {
+          mediaChunks: [{ mimeType: "audio/pcm", data: base64Audio }]
+        }
+      };
+      ws.send(JSON.stringify(audioMessage));
+    };
+    
+    source.connect(processor);
+    processor.connect(audioCtx.destination);
+  } catch(e) {}
+}
+
+async function playBase64Audio(base64Data) {
+  try {
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)({sampleRate: 24000});
+    const binaryString = atob(base64Data);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const audioBuffer = await audioCtx.decodeAudioData(bytes.buffer);
+    const source = audioCtx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioCtx.destination);
+    source.start(0);
+  } catch(e) {}
 }
 
 function setupCallUI(){
@@ -740,19 +862,21 @@ function toggleMute(){
 
 function endCall(){
   clearInterval(timerInt);clearTimeout(maxTimer);
+  try{ if(geminiWs) geminiWs.close(); }catch(e){}
+  try{ if(audioCtx) audioCtx.close(); }catch(e){}
   try{dc&&dc.close()}catch(e){} try{pc&&pc.close()}catch(e){}
   try{mediaStream&&mediaStream.getTracks().forEach(t=>t.stop())}catch(e){}
-  pc=dc=mediaStream=null; document.getElementById('feedbackModal').style.display='flex';
+  pc=dc=mediaStream=geminiWs=audioCtx=null; document.getElementById('feedbackModal').style.display='flex';
 }
 
 async function submitFeedback(){
   const comment=document.getElementById('feedbackComment').value.trim();
   const duration=Math.floor((Date.now()-currentSession.startTime)/1000);
   document.getElementById('feedbackModal').style.display='none'; show('home');
-  if(window.SUPABASE_URL && window.SUPABASE_ANON_KEY){
+  if(cfg.supabaseUrl && cfg.supabaseAnonKey){
     try{
-      await fetch(`${window.SUPABASE_URL}/rest/v1/ai_experiment_logs`,{
-        method:'POST',headers:{'apikey':window.SUPABASE_ANON_KEY,'Authorization':'Bearer '+window.SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      await fetch(`${cfg.supabaseUrl}/rest/v1/ai_experiment_logs`,{
+        method:'POST',headers:{'apikey':cfg.supabaseAnonKey,'Authorization':'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json','Prefer':'return=minimal'},
         body:JSON.stringify({session_id:currentSession.id,model_tested:currentSession.model,persona_chosen:PERSONAS[cfg.tone].name,duration_seconds:duration,naturalness:currentSession.ratings.nat,smoothness:currentSession.ratings.smooth,satisfaction:currentSession.ratings.sat,comment:comment})
       });
     }catch(e){}
