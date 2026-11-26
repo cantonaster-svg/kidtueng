@@ -353,7 +353,6 @@ function renderProviders(){
   document.querySelectorAll('.prov').forEach(b=>b.classList.toggle('active', b.dataset.p===cfg.provider));
 }
 
-// เลือก provider ตามที่ตั้งไว้ (ถ้าไม่มีคีย์ของตัวที่เลือก จะแจ้ง)
 function pickProvider(){
   const avail=[];
   if(cfg.openAiKey) avail.push('openai');
@@ -507,9 +506,6 @@ async function testSupabaseKey(){
   }
 }
 
-// ==========================================================
-// Gemini: ดึงรายชื่อโมเดลที่คีย์นี้ใช้ได้จริงจาก Google (ไม่ hardcode)
-// ==========================================================
 let geminiModelCache = null;
 let geminiCacheKey = '';
 let geminiWorkingChat = '';
@@ -531,7 +527,8 @@ async function getGeminiModels(key){
   const name = m => m.name.replace('models/','');
   const has = (m,method) => (m.supportedGenerationMethods||[]).includes(method);
 
-  const chatScore = n => (/flash/.test(n)?3:0) - (/lite/.test(n)?2:0) - (/preview|exp/.test(n)?5:0);
+  // ให้ลองพวก flash-latest หรือรุ่นทั่วไปก่อน เพื่อเลี่ยง 3.x high demand
+  const chatScore = n => (/flash-latest/.test(n)?4:/flash/.test(n)?3:0) - (/lite/.test(n)?2:0) - (/preview|exp/.test(n)?5:0);
   const chat = all.filter(m=>has(m,'generateContent')).map(name)
     .filter(n=>n.startsWith('gemini') && !/(image|tts|embedding|audio|live|aqa|robotics|computer|vision)/.test(n))
     .sort((a,b)=>(chatScore(b)-chatScore(a)) || (ver(b)-ver(a)));
@@ -556,7 +553,7 @@ async function checkGeminiModels(){
     msg.style.color='var(--text-main)';
     msg.textContent =
       `💬 โมเดลแชทที่ใช้ได้ (${chat.length}):\n${chat.slice(0,8).join('\n') || '- ไม่มี -'}\n\n` +
-      `📞 โมเดลโทรเสียง Live (${live.length}):\n${live.slice(0,8).join('\n') || '- ไม่มี (คีย์นี้โทรด้วย Gemini ไม่ได้) -'}`;
+      `📞 โมเดลโทรเสียง Live (${live.length}):\n${live.slice(0,8).join('\n') || '- ไม่มี -'}`;
   }catch(e){
     msg.style.color='var(--danger)';
     msg.textContent='✗ ดึงรายชื่อโมเดลไม่ได้: '+e.message;
@@ -571,7 +568,7 @@ async function geminiChat(contents, systemText, modelName){
   const data = await r.json();
   if(!r.ok) throw new Error(data.error?.message || ('HTTP '+r.status));
   const text = (data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
-  if(!text) throw new Error('ไม่มีข้อความตอบกลับ ('+(data.candidates?.[0]?.finishReason||'unknown')+')');
+  if(!text) throw new Error('ไม่มีข้อความตอบกลับ');
   return text;
 }
 
@@ -815,14 +812,11 @@ async function sendChat(){
       chatHistory.push({role:'assistant',content:`(Gemini Error: ${e.message})`});
     }
   } else {
-    chatHistory.push({role:'assistant',content:'(ไม่มี API Key ของ AI ที่เลือกไว้ ลองเปลี่ยนตัวเลือก "ใช้ AI" ที่หน้าหลัก)'});
+    chatHistory.push({role:'assistant',content:'(ไม่มี API Key ของ AI ที่เลือกไว้)'});
   }
   renderChat();
 }
 
-// ==========================================================
-// ให้คะแนน
-// ==========================================================
 let currentSession={id:'',model:'',startTime:0,ratings:{nat:0,smooth:0,sat:0}};
 document.querySelectorAll('.stars').forEach(group=>{
   const key=group.dataset.key;
@@ -836,7 +830,7 @@ document.querySelectorAll('.stars').forEach(group=>{
 });
 
 // ==========================================================
-// โทร
+// โทร (Live API - ปรับลดหน่วง ตอบสนองไวขึ้น)
 // ==========================================================
 let pc,mediaStream,dc,timerInt,maxTimer,activeModel='';
 let geminiWs=null, micCtx=null, playCtx=null, micProcessor=null, micSource=null;
@@ -850,7 +844,7 @@ async function parseWsMsg(ev){
 
 function tryGeminiLive(model, p){
   return new Promise((resolve,reject)=>{
-    const ws = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${cfg.geminiKey}`);
+    const ws = new WebSocket(`wss://generativelanguage.googleapis.com/v1beta/models/${model}:bidiGenerateContent?key=${cfg.geminiKey}`);
     let done=false;
     const timer=setTimeout(()=>{
       if(!done){ done=true; try{ws.close()}catch(e){} reject(new Error('หมดเวลารอ (10 วินาที)')); }
@@ -862,9 +856,11 @@ function tryGeminiLive(model, p){
           model:'models/'+model,
           generationConfig:{
             responseModalities:['AUDIO'],
-            speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:p.gVoice}}}
+            speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:p.gVoice}}},
+            // ปรับลด temperature ให้ตอบเร็วและแม่นยำขึ้น
+            temperature: 0.6
           },
-          systemInstruction:{parts:[{text:p.style+' พูดภาษาไทย คุยโต้ตอบด้วยเสียงสั้นๆ เป็นธรรมชาติ'}]},
+          systemInstruction:{parts:[{text:p.style+' พูดภาษาไทย คุยโต้ตอบด้วยเสียงสั้นๆ รวดเร็ว เป็นธรรมชาติ ไม่เกริ่นยาว'}]},
           outputAudioTranscription:{}
         }
       }));
@@ -905,7 +901,6 @@ function handleGeminiMsg(msg){
   if(sc.turnComplete) transcriptText='';
 }
 
-// Gemini ส่งเสียงกลับมาเป็น PCM 16-bit ดิบ ต้องแปลงเอง (decodeAudioData เล่นไม่ได้)
 function queuePcm(b64, mime){
   if(!playCtx) return;
   const rate = parseInt(((mime||'').match(/rate=(\d+)/)||[])[1] || '24000');
@@ -923,7 +918,8 @@ function queuePcm(b64, mime){
   src.buffer = buf;
   src.connect(playCtx.destination);
   const now = playCtx.currentTime;
-  if(playHead < now) playHead = now + 0.05;
+  // ลด buffer buffer หน่วงให้น้อยลงมากที่สุดเพื่อให้เสียงตอบกลับทันที
+  if(playHead < now) playHead = now + 0.01;
   src.start(playHead);
   playHead += buf.duration;
   playSources.push(src);
@@ -937,7 +933,8 @@ function stopPlayback(){
 
 function startGeminiMic(stream, ws){
   micSource = micCtx.createMediaStreamSource(stream);
-  micProcessor = micCtx.createScriptProcessor(4096,1,1);
+  // ลดขนาด buffer processor เหลือ 2048 เพื่อส่งข้อมูลไมค์ไวขึ้น (ลดความหน่วง)
+  micProcessor = micCtx.createScriptProcessor(2048,1,1);
   const mime = 'audio/pcm;rate='+micCtx.sampleRate;
   micProcessor.onaudioprocess = e=>{
     if(!ws || ws.readyState!==WebSocket.OPEN) return;
@@ -958,7 +955,7 @@ function startGeminiMic(stream, ws){
 
 async function startGeminiCall(p){
   const {live} = await getGeminiModels();
-  if(!live.length) throw new Error('คีย์ Gemini นี้ไม่มีโมเดลโทรเสียง (Live API) ให้ใช้');
+  if(!live.length) throw new Error('คีย์ Gemini นี้ไม่มีโมเดลโทรเสียง (Live API)');
   const list = geminiWorkingLive ? [geminiWorkingLive, ...live.filter(m=>m!==geminiWorkingLive)] : live;
   const errs=[];
   const cs=document.getElementById('connectStatus');
@@ -990,11 +987,10 @@ async function startCall(){
   const cs=document.getElementById('connectStatus');
   if(cs) cs.textContent='กำลังต่อสายอัจฉริยะ...';
 
-  // สร้าง AudioContext ทันทีตอนกดปุ่ม (iPhone ต้องสร้างใน user gesture)
   if(activeModel==='gemini'){
     const AC = window.AudioContext || window.webkitAudioContext;
     playCtx = new AC(); playCtx.resume();
-    micCtx = new AC(); micCtx.resume();
+    micCtx = new AC({sampleRate: 16000}); micCtx.resume();
   }
 
   try{
