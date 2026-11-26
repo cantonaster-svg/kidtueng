@@ -157,14 +157,17 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
   <div class="gate-card" style="max-width:380px;text-align:left">
     <h2 style="text-align:center">🛠️ Admin Panel</h2>
     <p style="text-align:center;margin-bottom:16px">จัดการ Supabase และ API Keys</p>
+    
     <div style="margin-bottom:12px">
       <label style="font-size:13px;font-weight:500">Supabase URL</label>
       <input type="text" id="setupSupabaseUrl" placeholder="https://..." style="margin-bottom:6px">
     </div>
+
     <div style="margin-bottom:12px">
       <label style="font-size:13px;font-weight:500">Supabase Anon Key</label>
       <input type="password" id="setupSupabaseKey" placeholder="eyJhbGci..." style="margin-bottom:6px">
     </div>
+
     <div style="margin-bottom:12px">
       <label style="font-size:13px;font-weight:500">OpenAI API Key</label>
       <input type="password" id="setupOpenAI" placeholder="sk-..." style="margin-bottom:6px">
@@ -231,7 +234,6 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
   <div class="under" id="callUnder">กดโทรหาน้องอุ่นใจ</div>
   <button id="chatBtn" onclick="show('chatScreen')">💬 ส่งข้อความแชท</button>
   <button class="sync-btn" onclick="syncConfig()">🔄 โหลดการตั้งค่าล่าสุดจากเซิร์ฟเวอร์</button>
-  <!-- เพิ่มปุ่มทางลัดไปหน้าแอดมินจากหน้าหลัก -->
   <button class="link-btn" onclick="show('adminLoginScreen')" style="margin-top:20px;display:block;width:100%;text-align:center;font-size:13.5px!important">⚙️ ไปที่หน้าแอดมิน / ตั้งค่าระบบ</button>
 </div>
 
@@ -488,18 +490,19 @@ async function adminSetupAndSave() {
   localStorage.setItem('soul_pin', pin);
   localStorage.setItem('soul_ab', JSON.stringify(cfg));
 
-  msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัสลง DB...';
+  msg.style.color='var(--text-sub)'; msg.textContent='กำลังบันทึกและเข้ารหัสขึ้น DB...';
   try {
     const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
     const targetUrl = `${cfg.supabaseUrl.trim()}/rest/v1/shared_configs`;
     
+    // แก้ไข Header ให้ถูกต้องตามมาตรฐาน Supabase REST API (ใช้ apikey และ Authorization ร่วมกันถูกต้อง)
     const r = await fetch(targetUrl, {
       method: 'POST',
       headers: { 
         'apikey': cfg.supabaseAnonKey.trim(), 
-        'Authorization': 'Bearer '+cfg.supabaseAnonKey.trim(), 
-        'Content-Type': 'application/json', 
-        'Prefer': 'resolution=merge-duplicates' 
+        'Authorization': 'Bearer ' + cfg.supabaseAnonKey.trim(), 
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
       },
       body: JSON.stringify({ id: 'main_config', encrypted_data: encrypted })
     });
@@ -513,7 +516,7 @@ async function adminSetupAndSave() {
     msg.textContent='✓ บันทึกสำเร็จ!';
   } catch(e) {
     msg.style.color='var(--danger)'; 
-    msg.textContent='✗ บันทึกไม่สำเร็จ: ' + (e.message || 'Network Error / Load failed');
+    msg.textContent='✗ บันทึกไม่สำเร็จ: ' + (e.message || 'Network Error');
   }
 }
 
