@@ -163,7 +163,6 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
       <input type="text" id="setupSupabaseUrl" placeholder="https://..." style="margin-bottom:6px">
     </div>
 
-    <!-- เปลี่ยนเป็น type="text" เพื่อให้มองเห็นและตรวจสอบช่องว่าง/การคัดลอกได้ชัดเจน -->
     <div style="margin-bottom:12px">
       <label style="font-size:13px;font-weight:500">Supabase Anon Key</label>
       <input type="text" id="setupSupabaseKey" placeholder="eyJhbGci..." style="margin-bottom:6px">
@@ -712,7 +711,8 @@ async function sendChat(){
         parts: [{text: m.content}]
       }));
 
-      const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+cfg.geminiKey,{
+      // อัปเดตใช้ gemini-2.5-flash หรือ gemini-1.5-flash ตามมาตรฐานล่าสุด
+      const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+cfg.geminiKey,{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
           system_instruction: {parts: [{text: p.style+' พูดไทย ตอบสั้น'}]},
@@ -789,7 +789,7 @@ async function startCall(){
       geminiWs.onopen=()=>{
         const setupMsg = {
           setup: {
-            model: "models/gemini-2.0-flash-exp",
+            model: "models/gemini-2.5-flash",
             generationConfig: { responseModalities: ["AUDIO"] },
             systemInstruction: { parts: [{ text: p.style + ' พูดคุยโต้ตอบด้วยเสียงสั้นๆ เป็นธรรมชาติ' }] }
           }
