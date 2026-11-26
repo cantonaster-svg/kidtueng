@@ -163,9 +163,11 @@ body{background:var(--bg-gradient);color:var(--text-main);height:100vh;overflow:
       <input type="text" id="setupSupabaseUrl" placeholder="https://..." style="margin-bottom:6px">
     </div>
 
+    <!-- เปลี่ยนเป็น type="text" เพื่อให้มองเห็นและตรวจสอบช่องว่าง/การคัดลอกได้ชัดเจน -->
     <div style="margin-bottom:12px">
       <label style="font-size:13px;font-weight:500">Supabase Anon Key</label>
-      <input type="password" id="setupSupabaseKey" placeholder="eyJhbGci..." style="margin-bottom:6px">
+      <input type="text" id="setupSupabaseKey" placeholder="eyJhbGci..." style="margin-bottom:6px">
+      <button class="testBtn" onclick="testSupabaseKey()">🔌 ทดสอบการเชื่อมต่อ Supabase</button>
     </div>
 
     <div style="margin-bottom:12px">
@@ -460,6 +462,30 @@ async function testApiKey(type){
   }
 }
 
+async function testSupabaseKey(){
+  const msg = document.getElementById('setupMsg');
+  const url = document.getElementById('setupSupabaseUrl').value.trim();
+  const key = document.getElementById('setupSupabaseKey').value.trim();
+  if(!url || !key){ msg.style.color='var(--danger)'; msg.textContent=`กรุณาใส่ URL และ Anon Key ให้ครบ`; return; }
+  msg.style.color='var(--text-sub)'; msg.textContent=`กำลังทดสอบ Supabase...`;
+  try{
+    const r = await fetch(`${url}/rest/v1/shared_configs?select=id&limit=1`, {
+      headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
+    });
+    if(r.ok){
+      msg.style.color='var(--sage)';
+      msg.textContent=`✓ Supabase เชื่อมต่อสำเร็จและคีย์ถูกต้อง!`;
+    } else {
+      const err = await r.json();
+      msg.style.color='var(--danger)';
+      msg.textContent=`✗ Supabase Error: ${err.message || r.status}`;
+    }
+  }catch(e){
+    msg.style.color='var(--danger)';
+    msg.textContent=`✗ เชื่อมต่อ Supabase ไม่ได้`;
+  }
+}
+
 async function adminSetupAndSave() {
   const sbUrl = document.getElementById('setupSupabaseUrl').value.trim();
   const sbKey = document.getElementById('setupSupabaseKey').value.trim();
@@ -495,7 +521,6 @@ async function adminSetupAndSave() {
     const encrypted = await encryptData({ openAiKey: openAi, geminiKey: gemini }, pin);
     const targetUrl = `${cfg.supabaseUrl.trim()}/rest/v1/shared_configs`;
     
-    // แก้ไข Header ให้ถูกต้องตามมาตรฐาน Supabase REST API (ใช้ apikey และ Authorization ร่วมกันถูกต้อง)
     const r = await fetch(targetUrl, {
       method: 'POST',
       headers: { 
