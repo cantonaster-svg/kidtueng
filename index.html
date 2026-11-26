@@ -686,6 +686,21 @@ function renderChat(){
   b.scrollTop=b.scrollHeight;
 }
 
+async function geminiChat(promptContents, systemText, modelName){
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cfg.geminiKey}`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      system_instruction: {parts: [{text: systemText}]},
+      contents: promptContents
+    })
+  });
+  const data=await r.json();
+  if(!r.ok || (data.error && data.error.code >= 429)){
+    throw new Error(data.error?.message || `HTTP ${r.status}`);
+  }
+  return data;
+}
+
 async function sendChat(){
   const inp=document.getElementById('chatText');const text=inp.value.trim();if(!text)return;
   inp.value='';chatHistory.push({role:'user',content:text});renderChat();
@@ -711,17 +726,24 @@ async function sendChat(){
         parts: [{text: m.content}]
       }));
 
-      const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key='+cfg.geminiKey,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          system_instruction: {parts: [{text: p.style+' พูดไทย ตอบสั้น'}]},
-          contents: contents
-        })
-      });
-      const data=await r.json();
-      if(!r.ok){
-        throw new Error(data.error?.message || `HTTP ${r.status}`);
+      const chatModels = ['gemini-3.8-flash','gemini-2.5-flash','gemini-1.5-flash'];
+      let lastErr = '';
+      let data = null;
+      for(const mName of chatModels){
+        try{
+          data = await geminiChat(contents, p.style+' พูดไทย ตอบสั้น', mName);
+          lastErr = '';
+          break;
+        }catch(err){
+          lastErr = err.message;
+          if(err.message.includes('high demand') || err.message.includes('429') || err.message.includes('not available')){
+            continue;
+          }
+          break;
+        }
       }
+      if(!data) throw new Error(lastErr || 'Gemini ทุกโมเดลไม่พร้อมใช้งาน');
+      
       const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '(ไม่มีคำตอบจาก Gemini)';
       chatHistory.push({role:'assistant',content: reply});
     }catch(e){
@@ -746,6 +768,76 @@ document.querySelectorAll('.stars').forEach(group=>{
 });
 
 let pc,mediaStream,dc,timerInt,maxTimer,activeModel='', geminiWs=null, audioCtx=null;
+
+async function connectGeminiCall(attemptModels, p, stream){
+  for(let i=0;i<attemptModels.length;i++){
+    const modelName = attemptModels[i];
+    return new Promise((resolve, reject)=>{
+      const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
+      geminiWs=new WebSocket(wsUrl);
+      
+      geminiWs.onopen=()=>{
+        const setupMsg = {
+          setup: {
+            model: "models/"+modelName,
+            generationConfig: { responseModalities: ["AUDIO"] },
+            systemInstruction: { parts: [{ text: p.style + ' พูดคุยโต้ตอบด้วยเสียงสั้นๆ เป็นธรรมชาติ' }] }
+          }
+        };
+        geminiWs.send(JSON.stringify(setupMsg));
+        setupCallUI();
+        startGeminiAudioStreaming(stream, geminiWs);
+        resolve();
+      };
+
+      geminiWs.onmessage=async (event)=>{
+        try {
+          let msgText = event.data;
+          if(event.data instanceof Blob) {
+            msgText = await event.data.text();
+          }
+          const response = JSON.parse(msgText);
+          if(response.error){
+            if((response.error.code === 429 || response.error.message.includes('high demand')) && i < attemptModels.length-1){
+              geminiWs.close();
+              return;
+            } else {
+              alert('Gemini Error: '+response.error.message);
+              endCall();
+            }
+          }
+          const parts = response.serverContent?.modelTurn?.parts;
+          if(parts) {
+            for(const part of parts) {
+              if(part.inlineData && part.inlineData.data) {
+                playBase64Audio(part.inlineData.data);
+              }
+              if(part.text) {
+                const tr = document.getElementById('transcript');
+                if(tr) tr.textContent = part.text;
+              }
+            }
+          }
+        } catch(e){}
+      };
+
+      geminiWs.onerror=(e)=>{
+        if(i < attemptModels.length-1){
+          geminiWs.close();
+        } else {
+          reject(new Error('Gemini เชื่อมต่อเสียงไม่ได้ทุกโมเดล'));
+        }
+      };
+      
+      geminiWs.onclose=()=>{
+        if(i < attemptModels.length-1) {
+          // จะ retry ในรอบถัดไป
+        }
+      };
+    });
+  }
+}
+
 async function startCall(){
   if(!cfg.openAiKey && !cfg.geminiKey){alert('กรุณาใส่ API Key ในระบบก่อน');return;}
   let available=[];
@@ -782,45 +874,8 @@ async function startCall(){
       await pc.setRemoteDescription({type:'answer',sdp:await ansr.text()});
       setupCallUI();
     }else{
-      const wsUrl=`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=`+cfg.geminiKey;
-      geminiWs=new WebSocket(wsUrl);
-      
-      geminiWs.onopen=()=>{
-        const setupMsg = {
-          setup: {
-            model: "models/gemini-3.8-flash",
-            generationConfig: { responseModalities: ["AUDIO"] },
-            systemInstruction: { parts: [{ text: p.style + ' พูดคุยโต้ตอบด้วยเสียงสั้นๆ เป็นธรรมชาติ' }] }
-          }
-        };
-        geminiWs.send(JSON.stringify(setupMsg));
-        setupCallUI();
-        startGeminiAudioStreaming(mediaStream, geminiWs);
-      };
-
-      geminiWs.onmessage=async (event)=>{
-        try {
-          let msgText = event.data;
-          if(event.data instanceof Blob) {
-            msgText = await event.data.text();
-          }
-          const response = JSON.parse(msgText);
-          const parts = response.serverContent?.modelTurn?.parts;
-          if(parts) {
-            for(const part of parts) {
-              if(part.inlineData && part.inlineData.data) {
-                playBase64Audio(part.inlineData.data);
-              }
-              if(part.text) {
-                const tr = document.getElementById('transcript');
-                if(tr) tr.textContent = part.text;
-              }
-            }
-          }
-        } catch(e){}
-      };
-
-      geminiWs.onerror=()=>{alert('Gemini เชื่อมต่อเสียงไม่ได้');endCall();};
+      const callModels = ['gemini-3.8-flash','gemini-2.5-flash','gemini-1.5-flash'];
+      await connectGeminiCall(callModels, p, mediaStream);
     }
   }catch(err){alert('ต่อสายไม่สำเร็จ\n\n'+err.message);endCall();}
 }
